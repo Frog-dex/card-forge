@@ -1,0 +1,914 @@
+{
+  "canvas": [
+    1650,
+    2250
+  ],
+  "window": [
+    119,
+    119,
+    1531,
+    2131
+  ],
+  "rows": [
+    "Characters",
+    "Locations",
+    "Vehicles",
+    "Relics",
+    "Story Elements",
+    "Motives",
+    "Elements"
+  ],
+  "cols": [
+    "water",
+    "wood",
+    "electric",
+    "fire",
+    "metal",
+    "earth",
+    "spirit"
+  ],
+  "cells": [
+    {
+      "row": 0,
+      "col": 0,
+      "category": "Characters",
+      "element": "water",
+      "hex": "#1c6baf",
+      "card": "card-08",
+      "faction": "water",
+      "art": {
+        "file": "card-08.bgra",
+        "x": 292,
+        "y": 220,
+        "w": 1066,
+        "h": 1810
+      },
+      "blank": false,
+      "label": "11_Characters_water_card-08",
+      "filename": "SS_11_Characters_water_card-08.kra",
+      "num": 1
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "category": "Characters",
+      "element": "wood",
+      "hex": "#85dc7b",
+      "card": "card-11",
+      "faction": "wood",
+      "art": {
+        "file": "card-11.bgra",
+        "x": 190,
+        "y": 278,
+        "w": 1270,
+        "h": 1694
+      },
+      "blank": false,
+      "label": "12_Characters_wood_card-11",
+      "filename": "SS_12_Characters_wood_card-11.kra",
+      "num": 2
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "category": "Characters",
+      "element": "electric",
+      "hex": "#d3cf61",
+      "card": "card-01",
+      "faction": "electric",
+      "art": {
+        "file": "card-01.bgra",
+        "x": 323,
+        "y": 220,
+        "w": 1004,
+        "h": 1810
+      },
+      "blank": false,
+      "label": "13_Characters_electric_card-01",
+      "filename": "SS_13_Characters_electric_card-01.kra",
+      "num": 3
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "category": "Characters",
+      "element": "fire",
+      "hex": "#c22c37",
+      "card": "card-07",
+      "faction": "fire",
+      "art": {
+        "file": "card-07.bgra",
+        "x": 190,
+        "y": 448,
+        "w": 1270,
+        "h": 1354
+      },
+      "blank": false,
+      "label": "14_Characters_fire_card-07",
+      "filename": "SS_14_Characters_fire_card-07.kra",
+      "num": 4
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "category": "Characters",
+      "element": "metal",
+      "hex": "#5a6068",
+      "card": "card-18",
+      "faction": "fire",
+      "art": {
+        "file": "card-18.bgra",
+        "x": 190,
+        "y": 469,
+        "w": 1270,
+        "h": 1311
+      },
+      "blank": false,
+      "label": "15_Characters_metal_card-18",
+      "filename": "SS_15_Characters_metal_card-18.kra",
+      "num": 5
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "category": "Characters",
+      "element": "earth",
+      "hex": "#684a36",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "16_Characters_earth_BLANK",
+      "filename": "SS_16_Characters_earth_BLANK.kra",
+      "num": 6
+    },
+    {
+      "row": 0,
+      "col": 6,
+      "category": "Characters",
+      "element": "spirit",
+      "hex": "#64318f",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "17_Characters_spirit_BLANK",
+      "filename": "SS_17_Characters_spirit_BLANK.kra",
+      "num": 7
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "category": "Locations",
+      "element": "water",
+      "hex": "#1c6baf",
+      "card": "card-06",
+      "faction": "water",
+      "art": {
+        "file": "card-06.bgra",
+        "x": 190,
+        "y": 283,
+        "w": 1270,
+        "h": 1684
+      },
+      "blank": false,
+      "label": "21_Locations_water_card-06",
+      "filename": "SS_21_Locations_water_card-06.kra",
+      "num": 8
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "category": "Locations",
+      "element": "wood",
+      "hex": "#85dc7b",
+      "card": "card-09",
+      "faction": "water",
+      "art": {
+        "file": "card-09.bgra",
+        "x": 190,
+        "y": 288,
+        "w": 1270,
+        "h": 1674
+      },
+      "blank": false,
+      "label": "22_Locations_wood_card-09",
+      "filename": "SS_22_Locations_wood_card-09.kra",
+      "num": 9
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "category": "Locations",
+      "element": "electric",
+      "hex": "#d3cf61",
+      "card": "card-10",
+      "faction": "water",
+      "art": {
+        "file": "card-10.bgra",
+        "x": 190,
+        "y": 715,
+        "w": 1270,
+        "h": 819
+      },
+      "blank": false,
+      "label": "23_Locations_electric_card-10",
+      "filename": "SS_23_Locations_electric_card-10.kra",
+      "num": 10
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "category": "Locations",
+      "element": "fire",
+      "hex": "#c22c37",
+      "card": "card-14",
+      "faction": "water",
+      "art": {
+        "file": "card-14.bgra",
+        "x": 190,
+        "y": 674,
+        "w": 1270,
+        "h": 902
+      },
+      "blank": false,
+      "label": "24_Locations_fire_card-14",
+      "filename": "SS_24_Locations_fire_card-14.kra",
+      "num": 11
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "category": "Locations",
+      "element": "metal",
+      "hex": "#5a6068",
+      "card": "card-15",
+      "faction": "water",
+      "art": {
+        "file": "card-15.bgra",
+        "x": 190,
+        "y": 666,
+        "w": 1270,
+        "h": 918
+      },
+      "blank": false,
+      "label": "25_Locations_metal_card-15",
+      "filename": "SS_25_Locations_metal_card-15.kra",
+      "num": 12
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "category": "Locations",
+      "element": "earth",
+      "hex": "#684a36",
+      "card": "card-17",
+      "faction": "water",
+      "art": {
+        "file": "card-17.bgra",
+        "x": 190,
+        "y": 699,
+        "w": 1270,
+        "h": 851
+      },
+      "blank": false,
+      "label": "26_Locations_earth_card-17",
+      "filename": "SS_26_Locations_earth_card-17.kra",
+      "num": 13
+    },
+    {
+      "row": 1,
+      "col": 6,
+      "category": "Locations",
+      "element": "spirit",
+      "hex": "#64318f",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "27_Locations_spirit_BLANK",
+      "filename": "SS_27_Locations_spirit_BLANK.kra",
+      "num": 14
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "category": "Vehicles",
+      "element": "water",
+      "hex": "#1c6baf",
+      "card": "card-19",
+      "faction": "earth",
+      "art": {
+        "file": "card-19.bgra",
+        "x": 190,
+        "y": 702,
+        "w": 1270,
+        "h": 845
+      },
+      "blank": false,
+      "label": "31_Vehicles_water_card-19",
+      "filename": "SS_31_Vehicles_water_card-19.kra",
+      "num": 15
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "category": "Vehicles",
+      "element": "wood",
+      "hex": "#85dc7b",
+      "card": "card-23",
+      "faction": "earth",
+      "art": {
+        "file": "card-23.bgra",
+        "x": 190,
+        "y": 828,
+        "w": 1270,
+        "h": 593
+      },
+      "blank": false,
+      "label": "32_Vehicles_wood_card-23",
+      "filename": "SS_32_Vehicles_wood_card-23.kra",
+      "num": 16
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "category": "Vehicles",
+      "element": "electric",
+      "hex": "#d3cf61",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "33_Vehicles_electric_BLANK",
+      "filename": "SS_33_Vehicles_electric_BLANK.kra",
+      "num": 17
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "category": "Vehicles",
+      "element": "fire",
+      "hex": "#c22c37",
+      "card": "card-25",
+      "faction": "fire",
+      "art": {
+        "file": "card-25.bgra",
+        "x": 190,
+        "y": 545,
+        "w": 1270,
+        "h": 1160
+      },
+      "blank": false,
+      "label": "34_Vehicles_fire_card-25",
+      "filename": "SS_34_Vehicles_fire_card-25.kra",
+      "num": 18
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "category": "Vehicles",
+      "element": "metal",
+      "hex": "#5a6068",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "35_Vehicles_metal_BLANK",
+      "filename": "SS_35_Vehicles_metal_BLANK.kra",
+      "num": 19
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "category": "Vehicles",
+      "element": "earth",
+      "hex": "#684a36",
+      "card": "card-13",
+      "faction": "earth",
+      "art": {
+        "file": "card-13.bgra",
+        "x": 190,
+        "y": 550,
+        "w": 1270,
+        "h": 1150
+      },
+      "blank": false,
+      "label": "36_Vehicles_earth_card-13",
+      "filename": "SS_36_Vehicles_earth_card-13.kra",
+      "num": 20
+    },
+    {
+      "row": 2,
+      "col": 6,
+      "category": "Vehicles",
+      "element": "spirit",
+      "hex": "#64318f",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "37_Vehicles_spirit_BLANK",
+      "filename": "SS_37_Vehicles_spirit_BLANK.kra",
+      "num": 21
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "category": "Relics",
+      "element": "water",
+      "hex": "#1c6baf",
+      "card": "card-22",
+      "faction": "water",
+      "art": {
+        "file": "card-22.bgra",
+        "x": 190,
+        "y": 431,
+        "w": 1270,
+        "h": 1387
+      },
+      "blank": false,
+      "label": "41_Relics_water_card-22",
+      "filename": "SS_41_Relics_water_card-22.kra",
+      "num": 22
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "category": "Relics",
+      "element": "wood",
+      "hex": "#85dc7b",
+      "card": "card-28",
+      "faction": "wood",
+      "art": {
+        "file": "card-28.bgra",
+        "x": 190,
+        "y": 599,
+        "w": 1270,
+        "h": 1052
+      },
+      "blank": false,
+      "label": "42_Relics_wood_card-28",
+      "filename": "SS_42_Relics_wood_card-28.kra",
+      "num": 23
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "category": "Relics",
+      "element": "electric",
+      "hex": "#d3cf61",
+      "card": "card-26",
+      "faction": "electric",
+      "art": {
+        "file": "card-26.bgra",
+        "x": 190,
+        "y": 534,
+        "w": 1270,
+        "h": 1181
+      },
+      "blank": false,
+      "label": "43_Relics_electric_card-26",
+      "filename": "SS_43_Relics_electric_card-26.kra",
+      "num": 24
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "category": "Relics",
+      "element": "fire",
+      "hex": "#c22c37",
+      "card": "card-20",
+      "faction": "fire",
+      "art": {
+        "file": "card-20.bgra",
+        "x": 190,
+        "y": 252,
+        "w": 1270,
+        "h": 1746
+      },
+      "blank": false,
+      "label": "44_Relics_fire_card-20",
+      "filename": "SS_44_Relics_fire_card-20.kra",
+      "num": 25
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "category": "Relics",
+      "element": "metal",
+      "hex": "#5a6068",
+      "card": "card-27",
+      "faction": "metal",
+      "art": {
+        "file": "card-27.bgra",
+        "x": 190,
+        "y": 595,
+        "w": 1270,
+        "h": 1059
+      },
+      "blank": false,
+      "label": "45_Relics_metal_card-27",
+      "filename": "SS_45_Relics_metal_card-27.kra",
+      "num": 26
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "category": "Relics",
+      "element": "earth",
+      "hex": "#684a36",
+      "card": "card-24",
+      "faction": "water",
+      "art": {
+        "file": "card-24.bgra",
+        "x": 190,
+        "y": 300,
+        "w": 1270,
+        "h": 1650
+      },
+      "blank": false,
+      "label": "46_Relics_earth_card-24",
+      "filename": "SS_46_Relics_earth_card-24.kra",
+      "num": 27
+    },
+    {
+      "row": 3,
+      "col": 6,
+      "category": "Relics",
+      "element": "spirit",
+      "hex": "#64318f",
+      "card": "card-21",
+      "faction": "spirit",
+      "art": {
+        "file": "card-21.bgra",
+        "x": 190,
+        "y": 493,
+        "w": 1270,
+        "h": 1264
+      },
+      "blank": false,
+      "label": "47_Relics_spirit_card-21",
+      "filename": "SS_47_Relics_spirit_card-21.kra",
+      "num": 28
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "category": "Story Elements",
+      "element": "water",
+      "hex": "#1c6baf",
+      "card": "card-03",
+      "faction": "water",
+      "art": {
+        "file": "card-03.bgra",
+        "x": 190,
+        "y": 522,
+        "w": 1270,
+        "h": 1206
+      },
+      "blank": false,
+      "label": "51_Story-Elements_water_card-03",
+      "filename": "SS_51_Story-Elements_water_card-03.kra",
+      "num": 29
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "category": "Story Elements",
+      "element": "wood",
+      "hex": "#85dc7b",
+      "card": "card-12",
+      "faction": "wood",
+      "art": {
+        "file": "card-12.bgra",
+        "x": 190,
+        "y": 757,
+        "w": 1270,
+        "h": 736
+      },
+      "blank": false,
+      "label": "52_Story-Elements_wood_card-12",
+      "filename": "SS_52_Story-Elements_wood_card-12.kra",
+      "num": 30
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "category": "Story Elements",
+      "element": "electric",
+      "hex": "#d3cf61",
+      "card": "card-29",
+      "faction": "water",
+      "art": {
+        "file": "card-29.bgra",
+        "x": 373,
+        "y": 220,
+        "w": 903,
+        "h": 1810
+      },
+      "blank": false,
+      "label": "53_Story-Elements_electric_card-29",
+      "filename": "SS_53_Story-Elements_electric_card-29.kra",
+      "num": 31
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "category": "Story Elements",
+      "element": "fire",
+      "hex": "#c22c37",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "54_Story-Elements_fire_BLANK",
+      "filename": "SS_54_Story-Elements_fire_BLANK.kra",
+      "num": 32
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "category": "Story Elements",
+      "element": "metal",
+      "hex": "#5a6068",
+      "card": "card-04",
+      "faction": "metal",
+      "art": {
+        "file": "card-04.bgra",
+        "x": 190,
+        "y": 585,
+        "w": 1270,
+        "h": 1079
+      },
+      "blank": false,
+      "label": "55_Story-Elements_metal_card-04",
+      "filename": "SS_55_Story-Elements_metal_card-04.kra",
+      "num": 33
+    },
+    {
+      "row": 4,
+      "col": 5,
+      "category": "Story Elements",
+      "element": "earth",
+      "hex": "#684a36",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "56_Story-Elements_earth_BLANK",
+      "filename": "SS_56_Story-Elements_earth_BLANK.kra",
+      "num": 34
+    },
+    {
+      "row": 4,
+      "col": 6,
+      "category": "Story Elements",
+      "element": "spirit",
+      "hex": "#64318f",
+      "card": "card-02",
+      "faction": "spirit",
+      "art": {
+        "file": "card-02.bgra",
+        "x": 388,
+        "y": 220,
+        "w": 873,
+        "h": 1810
+      },
+      "blank": false,
+      "label": "57_Story-Elements_spirit_card-02",
+      "filename": "SS_57_Story-Elements_spirit_card-02.kra",
+      "num": 35
+    },
+    {
+      "row": 5,
+      "col": 0,
+      "category": "Motives",
+      "element": "water",
+      "hex": "#1c6baf",
+      "card": "card-16",
+      "faction": "wood",
+      "art": {
+        "file": "card-16.bgra",
+        "x": 190,
+        "y": 379,
+        "w": 1270,
+        "h": 1492
+      },
+      "blank": false,
+      "label": "61_Motives_water_card-16",
+      "filename": "SS_61_Motives_water_card-16.kra",
+      "num": 36
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "category": "Motives",
+      "element": "wood",
+      "hex": "#85dc7b",
+      "card": "card-05",
+      "faction": "wood",
+      "art": {
+        "file": "card-05.bgra",
+        "x": 190,
+        "y": 684,
+        "w": 1270,
+        "h": 881
+      },
+      "blank": false,
+      "label": "62_Motives_wood_card-05",
+      "filename": "SS_62_Motives_wood_card-05.kra",
+      "num": 37
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "category": "Motives",
+      "element": "electric",
+      "hex": "#d3cf61",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "63_Motives_electric_BLANK",
+      "filename": "SS_63_Motives_electric_BLANK.kra",
+      "num": 38
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "category": "Motives",
+      "element": "fire",
+      "hex": "#c22c37",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "64_Motives_fire_BLANK",
+      "filename": "SS_64_Motives_fire_BLANK.kra",
+      "num": 39
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "category": "Motives",
+      "element": "metal",
+      "hex": "#5a6068",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "65_Motives_metal_BLANK",
+      "filename": "SS_65_Motives_metal_BLANK.kra",
+      "num": 40
+    },
+    {
+      "row": 5,
+      "col": 5,
+      "category": "Motives",
+      "element": "earth",
+      "hex": "#684a36",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "66_Motives_earth_BLANK",
+      "filename": "SS_66_Motives_earth_BLANK.kra",
+      "num": 41
+    },
+    {
+      "row": 5,
+      "col": 6,
+      "category": "Motives",
+      "element": "spirit",
+      "hex": "#64318f",
+      "card": null,
+      "art": null,
+      "blank": true,
+      "label": "67_Motives_spirit_BLANK",
+      "filename": "SS_67_Motives_spirit_BLANK.kra",
+      "num": 42
+    },
+    {
+      "row": 6,
+      "col": 0,
+      "category": "Elements",
+      "element": "water",
+      "hex": "#1c6baf",
+      "card": "element-water",
+      "art": {
+        "file": "emblem_water.bgra",
+        "x": 317,
+        "y": 686,
+        "w": 1016,
+        "h": 878
+      },
+      "blank": false,
+      "label": "71_Elements_water_EMBLEM",
+      "filename": "SS_71_Elements_water_EMBLEM.kra",
+      "num": 43
+    },
+    {
+      "row": 6,
+      "col": 1,
+      "category": "Elements",
+      "element": "wood",
+      "hex": "#85dc7b",
+      "card": "element-wood",
+      "art": {
+        "file": "emblem_wood.bgra",
+        "x": 317,
+        "y": 682,
+        "w": 1016,
+        "h": 885
+      },
+      "blank": false,
+      "label": "72_Elements_wood_EMBLEM",
+      "filename": "SS_72_Elements_wood_EMBLEM.kra",
+      "num": 44
+    },
+    {
+      "row": 6,
+      "col": 2,
+      "category": "Elements",
+      "element": "electric",
+      "hex": "#d3cf61",
+      "card": "element-electric",
+      "art": {
+        "file": "emblem_electric.bgra",
+        "x": 317,
+        "y": 682,
+        "w": 1016,
+        "h": 885
+      },
+      "blank": false,
+      "label": "73_Elements_electric_EMBLEM",
+      "filename": "SS_73_Elements_electric_EMBLEM.kra",
+      "num": 45
+    },
+    {
+      "row": 6,
+      "col": 3,
+      "category": "Elements",
+      "element": "fire",
+      "hex": "#c22c37",
+      "card": "element-fire",
+      "art": {
+        "file": "emblem_fire.bgra",
+        "x": 317,
+        "y": 682,
+        "w": 1016,
+        "h": 885
+      },
+      "blank": false,
+      "label": "74_Elements_fire_EMBLEM",
+      "filename": "SS_74_Elements_fire_EMBLEM.kra",
+      "num": 46
+    },
+    {
+      "row": 6,
+      "col": 4,
+      "category": "Elements",
+      "element": "metal",
+      "hex": "#5a6068",
+      "card": "element-metal",
+      "art": {
+        "file": "emblem_metal.bgra",
+        "x": 317,
+        "y": 684,
+        "w": 1016,
+        "h": 881
+      },
+      "blank": false,
+      "label": "75_Elements_metal_EMBLEM",
+      "filename": "SS_75_Elements_metal_EMBLEM.kra",
+      "num": 47
+    },
+    {
+      "row": 6,
+      "col": 5,
+      "category": "Elements",
+      "element": "earth",
+      "hex": "#684a36",
+      "card": "element-earth",
+      "art": {
+        "file": "emblem_earth.bgra",
+        "x": 317,
+        "y": 684,
+        "w": 1016,
+        "h": 881
+      },
+      "blank": false,
+      "label": "76_Elements_earth_EMBLEM",
+      "filename": "SS_76_Elements_earth_EMBLEM.kra",
+      "num": 48
+    },
+    {
+      "row": 6,
+      "col": 6,
+      "category": "Elements",
+      "element": "spirit",
+      "hex": "#64318f",
+      "card": "element-spirit",
+      "art": {
+        "file": "emblem_spirit.bgra",
+        "x": 317,
+        "y": 684,
+        "w": 1016,
+        "h": 881
+      },
+      "blank": false,
+      "label": "77_Elements_spirit_EMBLEM",
+      "filename": "SS_77_Elements_spirit_EMBLEM.kra",
+      "num": 49
+    }
+  ]
+}

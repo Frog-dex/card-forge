@@ -1,0 +1,73 @@
+{
+  "canvas": [
+    1650,
+    2250
+  ],
+  "dpi": 600,
+  "bleed": 75,
+  "safe": 75,
+  "trim": [
+    75,
+    75,
+    1575,
+    2175
+  ],
+  "safebox": [
+    150,
+    150,
+    1500,
+    2100
+  ],
+  "window": [
+    119,
+    119,
+    1531,
+    2131
+  ],
+  "win_r": 60,
+  "source": "spiritstriker.app real coded assets",
+  "elements": {
+    "fire": {
+      "name": "Fire - Lizard",
+      "style": "marble",
+      "hex": "#c22c37",
+      "file": "border_fire.bgra"
+    },
+    "water": {
+      "name": "Water - Frog",
+      "style": "marble",
+      "hex": "#1c6baf",
+      "file": "border_water.bgra"
+    },
+    "wood": {
+      "name": "Wood - Monkey",
+      "style": "marble",
+      "hex": "#85dc7b",
+      "file": "border_wood.bgra"
+    },
+    "electric": {
+      "name": "Electric - Bee",
+      "style": "marble",
+      "hex": "#d3cf61",
+      "file": "border_electric.bgra"
+    },
+    "earth": {
+      "name": "Earth - Rockfish",
+      "style": "marble",
+      "hex": "#684a36",
+      "file": "border_earth.bgra"
+    },
+    "spirit": {
+      "name": "Spirit - Dragon",
+      "style": "marble",
+      "hex": "#64318f",
+      "file": "border_spirit.bgra"
+    },
+    "metal": {
+      "name": "Metal - Crow",
+      "style": "marble",
+      "hex": "#5a6068",
+      "file": "border_metal.bgra"
+    }
+  }
+}

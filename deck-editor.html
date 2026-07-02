@@ -1,0 +1,163 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Spirit Strikers — Deck Editor</title>
+<style>
+  :root{--bg:#141416;--panel:#1e1e22;--ink:#e8e4dc;--gold:#c9a24a;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 -apple-system,Segoe UI,Arial}
+  header{position:sticky;top:0;z-index:10;background:var(--panel);padding:10px 14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #333}
+  header b{color:var(--gold);font-size:16px;margin-right:6px}
+  button,label{font:13px inherit}
+  button{background:#2a2a30;color:var(--ink);border:1px solid #444;border-radius:7px;padding:7px 11px;cursor:pointer}
+  button:hover{border-color:var(--gold)}
+  button.on{background:var(--gold);color:#1a1505;border-color:var(--gold)}
+  .seg{display:inline-flex;border:1px solid #444;border-radius:8px;overflow:hidden}
+  .seg button{border:none;border-radius:0}
+  input[type=range]{accent-color:var(--gold);vertical-align:middle}
+  #hint{color:#9a978f;font-size:12px}
+  #grid{display:grid;grid-template-columns:120px repeat(7,1fr);gap:8px;padding:14px;max-width:1500px}
+  .colh{ text-align:center;font-weight:700;font-size:12px;letter-spacing:.5px;padding-bottom:2px}
+  .rowh{display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#cfc8ba;font-size:13px}
+  .cell{position:relative;border-radius:9px}
+  .cell canvas{width:100%;display:block;border-radius:9px}
+  .cell .art{position:absolute;inset:0;cursor:grab}
+  .cell.drag-over{outline:3px dashed var(--gold);outline-offset:2px}
+  .num{position:absolute;left:4px;bottom:2px;font-size:10px;color:#8a8;opacity:.0}
+</style></head>
+<body>
+<header>
+  <b>Spirit Strikers — Deck Editor</b>
+  <div class="seg"><button id="mLight">Light</button><button id="mDark" class="on">Dark</button></div>
+  <label>line thickness <input id="thin" type="range" min="40" max="210" value="110"></label>
+  <button id="expL">⬇ Light PNG</button>
+  <button id="expD">⬇ Dark PNG</button>
+  <button id="expJ">⬇ arrangement.json</button>
+  <button id="reset">Reset</button>
+  <span id="hint">drag any artwork onto another card to swap positions — it recolors to the new element. Frames & numbers stay put.</span>
+</header>
+<div id="grid"></div>
+
+<script>
+const ROOT="./", CUT="../../spirit-strikers-deck/images/cards-vector/";
+const CW=1650, CH=2250, BLEED=75, BORDER=44;
+const WIN=[BLEED+BORDER,BLEED+BORDER,CW-BLEED-BORDER,CH-BLEED-BORDER];
+const CARDW=210, CARDH=Math.round(CARDW*CH/CW), S=CARDW/CW;
+const ELEMHEX={water:"#1c6baf",wood:"#85dc7b",metal:"#5a6068",electric:"#d3cf61",fire:"#c22c37",earth:"#684a36",spirit:"#64318f"};
+let MODE="dark", THIN=110, plan, cols, rows, cells, artOf={}, imgs={};
+
+function loadImg(src){return new Promise(res=>{const i=new Image();i.crossOrigin="anonymous";i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src;});}
+async function preload(urls){const u=[...new Set(urls)];const arr=await Promise.all(u.map(loadImg));u.forEach((s,i)=>imgs[s]=arr[i]);}
+
+// recolor + thin a line-art cutout to solid color at threshold THIN
+function lineArt(img, col){
+  const c=document.createElement("canvas");c.width=img.width;c.height=img.height;
+  const x=c.getContext("2d");x.drawImage(img,0,0);
+  const d=x.getImageData(0,0,c.width,c.height),p=d.data;
+  const [r,g,b]=col;
+  for(let i=0;i<p.length;i+=4){ if(p[i+3]>THIN){p[i]=r;p[i+1]=g;p[i+2]=b;p[i+3]=255;} else p[i+3]=0; }
+  x.putImageData(d,0,0);return c;
+}
+function cardURLs(a){ // image urls needed for artwork id a.card
+  if(!a) return [];
+  if(a.card && a.card.startsWith("element-")) return [ROOT+"elements/emblem_"+a.card.slice(8)+".png"];
+  if(a.card) return [CUT+a.card+".png"];
+  return [];
+}
+function artImg(a){
+  if(!a||!a.card) return null;
+  if(a.card.startsWith("element-")) return imgs[ROOT+"elements/emblem_"+a.card.slice(8)+".png"];
+  return imgs[CUT+a.card+".png"];
+}
+
+function drawCell(cv, r, c){
+  const num=r*7+c+1, elem=cols[c], x=cv.getContext("2d");
+  const a=artOf[r+"_"+c];
+  const isEmb=a&&a.card&&a.card.startsWith("element-");
+  x.clearRect(0,0,CARDW,CARDH);
+  // interior (emblems always dark; else per mode)
+  x.fillStyle = isEmb ? "#141418" : (MODE==="light"?"#ffffff":"#18181c");
+  roundRect(x,0,0,CARDW,CARDH,9);x.fill();
+  // artwork
+  if(a&&a.art){
+    const im=artImg(a);
+    if(im){
+      const ax=a.art.x*S, ay=a.art.y*S, aw=a.art.w*S, ah=a.art.h*S;
+      if(isEmb){ x.drawImage(im,ax,ay,aw,ah); }
+      else { const col=MODE==="light"?[18,18,18]:[242,242,242]; x.drawImage(lineArt(im,col),ax,ay,aw,ah); }
+    }
+  }
+  // border + marbles (fixed to this position)
+  const bd=imgs[ROOT+"borders/border_"+elem+".png"]; if(bd)x.drawImage(bd,0,0,CARDW,CARDH);
+  const mt=imgs[ROOT+"marbles/"+String(num).padStart(2,"0")+"_top.png"];
+  const mb=imgs[ROOT+"marbles/"+String(num).padStart(2,"0")+"_bot.png"];
+  const D=286*S, off=(BLEED+5)*S;
+  if(mt)x.drawImage(mt,off,off,D,D);
+  if(mb)x.drawImage(mb,CARDW-off-D,CARDH-off-D,D,D);
+}
+function roundRect(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);x.arcTo(X+W,Y+H,X,Y+H,r);x.arcTo(X,Y+H,X,Y,r);x.arcTo(X,Y,X+W,Y,r);x.closePath();}
+
+function renderAll(){ document.querySelectorAll("canvas[data-rc]").forEach(cv=>{const [r,c]=cv.dataset.rc.split("_").map(Number);drawCell(cv,r,c);}); }
+
+function build(){
+  const g=document.getElementById("grid");g.innerHTML="";
+  g.appendChild(el("div",""));
+  cols.forEach(k=>{const d=el("div","colh");d.textContent=k.toUpperCase();d.style.color=ELEMHEX[k];g.appendChild(d);});
+  for(let r=0;r<7;r++){
+    const rh=el("div","rowh");rh.textContent=rows[r];g.appendChild(rh);
+    for(let c=0;c<7;c++){
+      const cell=el("div","cell");cell.dataset.rc=r+"_"+c;
+      const cv=document.createElement("canvas");cv.width=CARDW;cv.height=CARDH;cv.dataset.rc=r+"_"+c;cell.appendChild(cv);
+      const art=el("div","art");art.draggable=true;art.dataset.rc=r+"_"+c;cell.appendChild(art);
+      art.addEventListener("dragstart",e=>{e.dataTransfer.setData("text",art.dataset.rc);});
+      cell.addEventListener("dragover",e=>{e.preventDefault();cell.classList.add("drag-over");});
+      cell.addEventListener("dragleave",()=>cell.classList.remove("drag-over"));
+      cell.addEventListener("drop",e=>{e.preventDefault();cell.classList.remove("drag-over");
+        const from=e.dataTransfer.getData("text"),to=cell.dataset.rc;
+        if(from&&from!==to){const t=artOf[from];artOf[from]=artOf[to];artOf[to]=t;
+          drawCell(qc(from),...from.split("_").map(Number));drawCell(qc(to),...to.split("_").map(Number));}
+      });
+      g.appendChild(cell);
+    }
+  }
+  renderAll();
+}
+const qc=rc=>document.querySelector('canvas[data-rc="'+rc+'"]');
+const el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e;};
+
+// export full deck sheet (mode) to PNG
+function exportSheet(mode){
+  const prev=MODE;MODE=mode;
+  const TW=CARDW,TH=CARDH,PAD=14,GUT=118,TOP=34,LBL=20;
+  const SW=GUT+7*(TW+PAD)+PAD, SH=TOP+7*(TH+LBL+PAD)+PAD;
+  const cv=document.createElement("canvas");cv.width=SW;cv.height=SH;const x=cv.getContext("2d");
+  x.fillStyle=mode==="light"?"#e8e4dc":"#101012";x.fillRect(0,0,SW,SH);
+  const tmp=document.createElement("canvas");tmp.width=TW;tmp.height=TH;
+  for(let r=0;r<7;r++)for(let c=0;c<7;c++){drawCell(tmp,r,c);x.drawImage(tmp,GUT+c*(TW+PAD),TOP+r*(TH+LBL+PAD));}
+  MODE=prev;
+  cv.toBlob(b=>{const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="DECK-"+mode.toUpperCase()+".png";a.click();});
+}
+function exportJSON(){
+  const out=[];for(let r=0;r<7;r++)for(let c=0;c<7;c++){const a=artOf[r+"_"+c];out.push({row:r,col:c,num:r*7+c+1,element:cols[c],card:a?a.card:null});}
+  const b=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});const u=URL.createObjectURL(b);
+  const a=document.createElement("a");a.href=u;a.download="arrangement.json";a.click();
+}
+
+async function init(){
+  plan=await (await fetch(ROOT+"plan.json")).json();
+  cols=plan.cols;rows=plan.rows;cells=plan.cells;
+  cells.forEach(c=>{artOf[c.row+"_"+c.col]=c.card?{card:c.card,art:c.art}:null;});
+  const urls=[];
+  cols.forEach(k=>urls.push(ROOT+"borders/border_"+k+".png"));
+  for(let n=1;n<=49;n++){urls.push(ROOT+"marbles/"+String(n).padStart(2,"0")+"_top.png",ROOT+"marbles/"+String(n).padStart(2,"0")+"_bot.png");}
+  cells.forEach(c=>cardURLs(c.card?{card:c.card}:null).forEach(u=>urls.push(u)));
+  await preload(urls);
+  build();
+}
+document.getElementById("mLight").onclick=()=>{MODE="light";toggle();renderAll();};
+document.getElementById("mDark").onclick=()=>{MODE="dark";toggle();renderAll();};
+function toggle(){mLight.classList.toggle("on",MODE==="light");mDark.classList.toggle("on",MODE==="dark");}
+document.getElementById("thin").oninput=e=>{THIN=+e.target.value;renderAll();};
+document.getElementById("expL").onclick=()=>exportSheet("light");
+document.getElementById("expD").onclick=()=>exportSheet("dark");
+document.getElementById("expJ").onclick=exportJSON;
+document.getElementById("reset").onclick=()=>{cells.forEach(c=>{artOf[c.row+"_"+c.col]=c.card?{card:c.card,art:c.art}:null;});renderAll();};
+init();
+</script></body></html>
