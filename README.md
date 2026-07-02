@@ -139,7 +139,7 @@ scripts/                the 20 Python build scripts
 ## Publish
 
 ```bash
-gh repo create blu-inman/card-forge --public --source . --push
+gh repo create moomoomoo6969/card-forge --public --source . --push
 ```
 
 ## License
