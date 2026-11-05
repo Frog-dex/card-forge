@@ -6,6 +6,7 @@ Full-bleed colored bespoke frame + rounded art window. Outputs PNG + raw BGRA
 import os, json
 import numpy as np
 from PIL import Image, ImageDraw, ImageChops, ImageFilter
+from forge_paths import FORGE_ROOT
 
 DPI = 600
 W, H = 1650, 2250          # 2.75 x 3.75 in  (2.5x3.5 trim + 1/8in bleed)
@@ -19,7 +20,7 @@ WIN = (BLEED+BORDER, BLEED+BORDER, W-BLEED-BORDER, H-BLEED-BORDER)  # art window
 WIN_R = 60
 SS = 2
 
-OUT = "/Users/blu/card-borders/poker-deck/borders"
+OUT = os.path.join(FORGE_ROOT, "borders")
 os.makedirs(OUT, exist_ok=True)
 
 # element key -> (display, style, shadow, mid, highlight)

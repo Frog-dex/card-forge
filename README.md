@@ -10,13 +10,30 @@ contact sheets for sign-off.
 
 Everything visual is generated in code. No stock textures, no flat PNG reuse.
 
+![Card Forge home page](docs/screenshots/home.png)
+
 ## Features
 
+### In the browser (static HTML, zero dependencies)
+
+- **Studio hub** (`index.html`) — box art, the seven factions rendered as live cards,
+  the pipeline at a glance and the Sovereign Software shelf.
 - **Deck editor** (`deck-editor.html`) — a 7×7 grid (7 categories × 7 elements) rendered
-  live on `<canvas>`. Drag any artwork onto another card to swap positions; the line art
-  instantly recolors to the destination element. Frames and numbered marbles stay put.
-  Light/dark card interiors, a live line-thickness slider, one-click export of full deck
-  sheets (PNG) and the current `arrangement.json`.
+  live on `<canvas>`. Drag any artwork onto another card — or **tap one card, then another**
+  on touch screens / with the keyboard — to swap positions; the line art instantly recolors
+  to the destination element. Frames and numbered marbles stay put. Light/dark interiors, a
+  live line-thickness slider, **undo** (Ctrl/⌘-Z), **📁 Load art…** to pick local
+  `card-NN.png` cutouts without a server path, **import/export `arrangement.json`**, and
+  labeled full-deck PNG sheets.
+- **Card inspector** (`inspector.html`) — any card at print resolution with toggleable
+  trim / safe-area / art-window guides, trim-to-cut preview, light/dark interior, a print
+  spec sheet, swipe or ←/→ to browse, deep links (`inspector.html#46`) and a one-click
+  **600 DPI PNG** export.
+- **Marble gallery** (`marbles.html`) — all 98 corner marbles grouped by faction, filter
+  chips, symbol/number toggle and a lightbox with a 3D pointer-tilt and moving glint.
+
+### The print pipeline (Python)
+
 - **Procedural marble renderer** (`scripts/marble_render.py`) — every corner badge is a
   9-layer physically-motivated glass orb (diffuse, fresnel rim, transmission glow, crisp
   specular…). 49 cards × 2 marbles = 98 unique orbs from per-(card, slot) SHA-1 seeds,
@@ -40,25 +57,27 @@ self-contained prompt to rebuild the whole tool with an AI coding agent.
 
 ## Quick Start
 
-The deck editor is a single static HTML file — serve the repo root and open it:
+The site is plain static HTML — serve the repo root and open it (pages `fetch()` the
+plan and manifest, so `file://` won't work):
 
 ```bash
 cd card-forge
 python3 -m http.server 8080
-# then open  http://localhost:8080/deck-editor.html
+# then open  http://localhost:8080/
 ```
 
-It loads `plan.json`, the borders, and all 98 marbles from this repo. Drag artwork
-between cells, flip Light/Dark, tweak line thickness, then export:
+| Page | What it's for |
+|---|---|
+| `index.html` | the hub |
+| `deck-editor.html` | arrange the deck; export **⬇ Light/Dark PNG** sheets and **⬇ arrangement.json** |
+| `inspector.html#N` | inspect card *N* at print size, export a 600 DPI PNG |
+| `marbles.html` | browse the 98 corner marbles |
 
-- **⬇ Light PNG / ⬇ Dark PNG** — full 49-card deck sheet
-- **⬇ arrangement.json** — the current card layout for the build scripts
-
-> Note: the character/scene line-art cutouts are Blu's original drawings and are not
-> bundled (the editor's `CUT` constant at the top of the script points at
-> `../../spirit-strikers-deck/images/cards-vector/`). Without them the editor still runs —
-> you get borders, marbles, and the element-emblem row. Point `CUT` at `sample-art/` (or
-> your own PNG cutouts named `card-NN.png`) to see artwork.
+> **Line art:** the character/scene cutouts are Blu's original drawings and are not
+> bundled. Without them everything still runs — borders, marbles, the element-emblem row,
+> and a faint element glyph marking each art slot. To see artwork, either drop PNG cutouts
+> named `card-NN.png` into `sample-art/`, open any page with `?art=path/to/cutouts/`
+> (remembered per browser), or use **📁 Load art…** in the deck editor.
 
 ### Build scripts
 
@@ -66,7 +85,7 @@ The Python scripts need `numpy` and `Pillow`; some also use `scipy`, `potracer`
 (pure-Python potrace), and `PyMuPDF`:
 
 ```bash
-pip3 install numpy Pillow scipy potracer PyMuPDF
+pip3 install -r requirements.txt
 ```
 
 The pipeline, in order:
@@ -86,10 +105,25 @@ kritarunner -s build_poker_kra            # 49 layered .kra card files
 kritarunner -s build_49_marble_kra        # one .kra with 49 paintable clipping groups
 ```
 
-> **Paths:** the scripts were written against the author's working tree and hardcode
-> `/Users/blu/card-borders/poker-deck` (the `.kra` builders honor `SS_ROOT` / `SS49_DIR`
-> env vars). To run them elsewhere, point those constants at your own working directory.
-> The editor + shipped assets in this repo work as-is with no path changes.
+> **Paths:** every script reads its roots from `scripts/forge_paths.py`, so they run
+> anywhere via env vars (defaults are the author's original working tree):
+>
+> | Variable | Meaning |
+> |---|---|
+> | `CARD_FORGE_ROOT` | poker-deck working dir (`borders/`, `elements/`, `art/`, `marbles/`, `plan.json`) |
+> | `SS_DECK_DIR` | spirit-strikers-deck dir with the original line-art cutouts |
+> | `SS_DRAWINGS_PDF` | source PDF for `extract_crops_pdf.py` |
+> | `CARD_FORGE_FONT` | font for engraved numbers (falls back to Arial Rounded → DejaVu/Liberation) |
+> | `SS_ROOT`, `SS49_DIR`, `SS49_OUT` | Krita builders (`SS_ROOT` falls back to `CARD_FORGE_ROOT`) |
+>
+> For example, regenerate all 98 marbles from this repo's own assets:
+>
+> ```bash
+> mkdir -p /tmp/forge && cp -r borders elements plan.json /tmp/forge/
+> CARD_FORGE_ROOT=/tmp/forge python3 scripts/build_marbles_98.py
+> ```
+>
+> Lint with `ruff check scripts` (config in `ruff.toml`).
 
 ## How it works
 
@@ -116,6 +150,20 @@ earth `#684a36` · spirit `#64318f` · metal `#5a6068`.
 
 ## Screenshots
 
+| Deck editor | Card inspector (guides on) |
+|---|---|
+| ![deck editor](docs/screenshots/deck-editor.png) | ![card inspector](docs/screenshots/inspector.png) |
+
+| Marble gallery | Marble viewer |
+|---|---|
+| ![marble gallery](docs/screenshots/marbles.png) | ![marble lightbox](docs/screenshots/marbles-lightbox.png) |
+
+On a phone — the inspector stacks, the editor scrolls sideways and swaps by tapping:
+
+<img src="docs/screenshots/mobile-inspector.png" width="220" alt="inspector on mobile"> <img src="docs/screenshots/mobile-editor.png" width="220" alt="deck editor on mobile">
+
+### Raw assets
+
 | Fire border (600 DPI, full bleed) | Spirit gem emblem | Corner marble (card 1, symbol) | Trim/safe/window guides |
 |---|---|---|---|
 | ![fire border](borders/border_fire.png) | ![spirit emblem](elements/emblem_spirit.png) | ![marble](marbles/01_top.png) | ![guides](borders/guides.png) |
@@ -125,7 +173,11 @@ All 98 corner marbles live in [`marbles/`](marbles/) — every one a unique swir
 ## Repo layout
 
 ```
-deck-editor.html        drag-and-drop deck editor (single file, zero deps)
+index.html              studio hub
+deck-editor.html        drag-and-drop / tap-to-swap deck editor
+inspector.html          single-card print inspector + 600 DPI export
+marbles.html            98-marble gallery with tilt viewer
+assets/                 shared forge.css + forge.js (card compositor, data loader)
 plan.json               the 7x7 deck plan (cards, elements, art placement)
 card-categories.json    card-id -> category mapping
 MARBLE-RECIPE.md        how every glass marble is built (the 9 layers)
@@ -135,7 +187,9 @@ borders/                7 faction border PNGs + window base + guides + manifest
 elements/               7 gem emblems + 7 extracted element glyphs
 marbles/                98 unique corner marbles (NN_top / NN_bot)
 sample-art/             drop line-art cutouts here to feed the editor
-scripts/                the 20 Python build scripts
+scripts/                the 20 Python build scripts + forge_paths.py (shared paths)
+docs/                   box art, shelf boxes, screenshots
+requirements.txt        Python deps for the build scripts
 ```
 
 ## Publish

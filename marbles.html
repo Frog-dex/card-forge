@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Marble Gallery — Card Forge</title>
+<meta name="description" content="All 98 procedurally rendered glass corner marbles of the Spirit Strikers deck.">
+<meta name="theme-color" content="#141416">
+<link rel="icon" href="elements/emblem_spirit.png">
+<link rel="stylesheet" href="assets/forge.css">
+<style>
+  .head{padding:34px 0 10px}
+  .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:16px 0 6px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:14px;padding:14px 0 50px}
+  .orb{position:relative;border:0;background:none;padding:10px 6px 8px;border-radius:14px;cursor:zoom-in;text-align:center;color:var(--muted);
+    transition:background .2s}
+  .orb:hover{background:var(--panel)}
+  .orb img{width:100%;aspect-ratio:1;filter:drop-shadow(0 10px 12px rgba(0,0,0,.55));transition:transform .25s}
+  .orb:hover img{transform:scale(1.08) rotate(-4deg)}
+  .orb span{display:block;font-size:12px;margin-top:4px;text-transform:capitalize}
+  .orb span b{color:var(--c)}
+  .count{font-size:13px;color:var(--muted)}
+  /* group headers when grouped by faction */
+  .grp{grid-column:1/-1;display:flex;align-items:center;gap:12px;margin-top:10px;font:700 18px var(--display);color:var(--c)}
+  .grp img{width:34px}
+  .grp::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--c),transparent)}
+
+  /* lightbox */
+  dialog{border:0;padding:0;background:transparent;color:var(--ink);max-width:min(560px,94vw);width:100%}
+  dialog::backdrop{background:rgba(6,6,8,.82);backdrop-filter:blur(6px)}
+  .lb{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;text-align:center;position:relative}
+  .stage{perspective:800px;padding:10px 0 0;touch-action:none}
+  .ball{position:relative;width:min(360px,70vw);margin:0 auto;transform-style:preserve-3d;transition:transform .08s linear;border-radius:50%}
+  .ball img{width:100%;filter:drop-shadow(0 26px 30px rgba(0,0,0,.6))}
+  .ball .glint{position:absolute;inset:0;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+    background:radial-gradient(circle at var(--gx,30%) var(--gy,28%),rgba(255,255,255,.35),transparent 32%)}
+  .lb h3{margin:14px 0 2px;font-size:22px;color:var(--c)}
+  .lb .meta{font-size:13px;color:var(--muted)}
+  .lb .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .x{position:absolute;top:10px;right:12px;background:none;border:0;color:var(--muted);font-size:26px;cursor:pointer;line-height:1}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="brand" href="index.html"><img src="elements/emblem_spirit.png" alt="">Card Forge</a>
+  <a class="tab" href="index.html">Home</a>
+  <a class="tab" href="deck-editor.html">Deck Editor</a>
+  <a class="tab" href="inspector.html">Card Inspector</a>
+  <a class="tab" href="marbles.html" aria-current="page">Marbles</a>
+</nav>
+<main class="wrap">
+  <div class="head">
+    <div class="eyebrow">98 unique orbs</div>
+    <h2>Marble Gallery</h2>
+    <p class="lede">Each card carries two glass marbles: the element symbol on top, the card number below. A per-card,
+      per-slot seed gives every orb its own swirl, while locked light direction and faction colour keep the set cohesive.
+      Recipe: <a href="MARBLE-RECIPE.md">MARBLE-RECIPE.md</a>.</p>
+  </div>
+  <div class="bar">
+    <div class="chips" id="filters" role="group" aria-label="Filter by faction"></div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div class="seg" role="group" aria-label="Slot">
+        <button class="btn on" data-slot="all">Both</button><button class="btn" data-slot="top">Symbol</button><button class="btn" data-slot="bot">Number</button>
+      </div>
+      <span class="count" id="count"></span>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<dialog id="lb" aria-label="Marble viewer">
+  <div class="lb">
+    <button class="x" id="close" aria-label="Close">×</button>
+    <div class="stage" id="stage"><div class="ball" id="ball"><img id="lbImg" alt=""><div class="glint"></div></div></div>
+    <h3 id="lbTitle"></h3>
+    <div class="meta" id="lbMeta"></div>
+    <div class="row">
+      <button class="btn" id="prev">← Prev</button>
+      <a class="btn" id="open">Open card</a>
+      <a class="btn" id="dl" download>⬇ PNG</a>
+      <button class="btn" id="next">Next →</button>
+    </div>
+    <p class="muted" style="font-size:12px;margin:12px 0 0">Move the pointer (or drag) over the marble to tilt it. ← / → to browse.</p>
+  </div>
+</dialog>
+
+<script src="assets/forge.js"></script>
+<script>
+(async()=>{
+  const {plan,factions}=await Forge.load();
+  const fac=Object.fromEntries(factions.map(f=>[f.key,f]));
+  const all=[];
+  plan.cells.forEach(c=>["top","bot"].forEach(slot=>all.push({num:c.num,slot,elem:c.element,cat:c.category,card:c.card})));
+  let filter=new Set(), slot="all", shown=[], idx=0;
+
+  const fhost=document.getElementById("filters");
+  factions.forEach(f=>{
+    const b=document.createElement("button"); b.className="chip"; b.style.setProperty("--c",f.hex);
+    b.setAttribute("aria-pressed","false"); b.innerHTML=`<i></i>${f.name}`;
+    b.onclick=()=>{filter.has(f.key)?filter.delete(f.key):filter.add(f.key);b.setAttribute("aria-pressed",filter.has(f.key));render();};
+    fhost.appendChild(b);
+  });
+  document.querySelectorAll("[data-slot]").forEach(b=>b.onclick=()=>{
+    slot=b.dataset.slot; document.querySelectorAll("[data-slot]").forEach(o=>o.classList.toggle("on",o===b)); render();});
+
+  const grid=document.getElementById("grid");
+  function render(){
+    shown=all.filter(m=>(slot==="all"||m.slot===slot)&&(!filter.size||filter.has(m.elem)));
+    grid.innerHTML="";
+    // group by faction in column order so each colour family reads together
+    for(const f of factions){
+      const items=shown.filter(m=>m.elem===f.key); if(!items.length) continue;
+      const h=document.createElement("div"); h.className="grp"; h.style.setProperty("--c",f.hex);
+      h.innerHTML=`<img src="${Forge.urls.emblem(f.key)}" alt="">${f.name} · ${f.animal}`; grid.appendChild(h);
+      items.forEach(m=>{
+        const b=document.createElement("button"); b.className="orb"; b.style.setProperty("--c",f.hex);
+        b.innerHTML=`<img src="${Forge.urls.marble(m.num,m.slot)}" alt="Card ${m.num} ${m.slot==="top"?"symbol":"number"} marble" loading="lazy"><span>#${Forge.pad2(m.num)} <b>${m.slot==="top"?"symbol":"number"}</b></span>`;
+        b.onclick=()=>openLB(shown.indexOf(m)); grid.appendChild(b);
+      });
+    }
+    // reorder `shown` to match visual order for prev/next
+    shown=factions.flatMap(f=>shown.filter(m=>m.elem===f.key));
+    document.getElementById("count").textContent=shown.length+" of 98";
+  }
+  render();
+
+  const lb=document.getElementById("lb"), ball=document.getElementById("ball");
+  function openLB(i){
+    idx=(i+shown.length)%shown.length; const m=shown[idx], f=fac[m.elem], src=Forge.urls.marble(m.num,m.slot);
+    lb.style.setProperty("--c",f.hex);
+    document.getElementById("lbImg").src=src;
+    document.getElementById("lbTitle").textContent=`Card #${Forge.pad2(m.num)} — ${m.slot==="top"?"symbol":"number"} marble`;
+    document.getElementById("lbMeta").textContent=`${f.name} · ${f.animal} · ${m.cat}${m.card?" · "+m.card:""} · ${f.hex}`;
+    document.getElementById("open").href="inspector.html#"+m.num;
+    const dl=document.getElementById("dl"); dl.href=src; dl.download=`marble-${Forge.pad2(m.num)}-${m.slot}.png`;
+    if(!lb.open) lb.showModal();
+  }
+  document.getElementById("prev").onclick=()=>openLB(idx-1);
+  document.getElementById("next").onclick=()=>openLB(idx+1);
+  document.getElementById("close").onclick=()=>lb.close();
+  lb.addEventListener("click",e=>{if(e.target===lb)lb.close();});
+  addEventListener("keydown",e=>{if(!lb.open)return; if(e.key==="ArrowLeft")openLB(idx-1); if(e.key==="ArrowRight")openLB(idx+1);});
+
+  // 3D tilt + moving glint
+  const stage=document.getElementById("stage");
+  function tilt(e){
+    const r=ball.getBoundingClientRect(), px=(e.clientX-r.left)/r.width-.5, py=(e.clientY-r.top)/r.height-.5;
+    ball.style.transform=`rotateY(${px*28}deg) rotateX(${-py*28}deg)`;
+    ball.style.setProperty("--gx",(30-px*30)+"%"); ball.style.setProperty("--gy",(28-py*30)+"%");
+  }
+  stage.addEventListener("pointermove",tilt);
+  stage.addEventListener("pointerleave",()=>{ball.style.transform="";});
+})();
+</script>
+</body>
+</html>

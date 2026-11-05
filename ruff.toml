@@ -1,0 +1,4 @@
+# The scripts are compact one-off pipeline tools; lint for real bugs only.
+target-version = "py39"
+[lint]
+select = ["E9", "F", "E722"]

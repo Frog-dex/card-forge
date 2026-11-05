@@ -3,9 +3,10 @@
 NATIVE resolution -> originals/pdf/page-NN.png, and report sizes."""
 import os
 import fitz
+from forge_paths import FORGE_ROOT
 
-PDF="/Users/blu/Library/Mobile Documents/com~apple~CloudDocs/Art/Spirit Strikers/Drawings/Spirit-Strikers-Cropped-Drawings.pdf"
-OUT="/Users/blu/card-borders/poker-deck/originals/pdf"; os.makedirs(OUT,exist_ok=True)
+PDF=os.environ.get("SS_DRAWINGS_PDF", "/Users/blu/Library/Mobile Documents/com~apple~CloudDocs/Art/Spirit Strikers/Drawings/Spirit-Strikers-Cropped-Drawings.pdf")
+OUT=os.path.join(FORGE_ROOT, "originals/pdf"); os.makedirs(OUT,exist_ok=True)
 
 doc=fitz.open(PDF)
 print("pages:",len(doc))

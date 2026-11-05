@@ -4,9 +4,10 @@ number inset) for every cell in plan.json. Saves BGRA for the kritarunner
 assembler and updates plan.json with the badge filename."""
 import os, json
 import numpy as np
-from corner_badges import make_badge, W, H
+from corner_badges import make_badge
+from forge_paths import FORGE_ROOT
 
-ROOT="/Users/blu/card-borders/poker-deck"
+ROOT=FORGE_ROOT
 BADGES=os.path.join(ROOT,"badges"); os.makedirs(BADGES,exist_ok=True)
 P=json.load(open(os.path.join(ROOT,"plan.json")))
 

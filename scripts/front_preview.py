@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Render clean single-card FRONTS (cropped to trim, no guides) for review."""
-import json, os, sys
+import json, sys
 from PIL import Image, ImageDraw, ImageFont
 from corner_badges import make_badge, W, H, BLEED
+from forge_paths import FORGE_ROOT
 
-ROOT="/Users/blu/card-borders/poker-deck"; BORD=ROOT+"/borders"; ARTDIR=ROOT+"/art"
+ROOT=FORGE_ROOT; BORD=ROOT+"/borders"; ARTDIR=ROOT+"/art"
 P=json.load(open(ROOT+"/plan.json"))
 TRIM=(BLEED,BLEED,W-BLEED,H-BLEED)
 
@@ -26,7 +27,7 @@ sc=0.42; tw,th=int(1500*sc),int(2100*sc)
 gap=46; sheet=Image.new("RGB",(tw*len(cards)+gap*(len(cards)+1), th+gap+34),(244,240,232))
 d=ImageDraw.Draw(sheet)
 try: f=ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial.ttf",18)
-except: f=ImageFont.load_default()
+except Exception: f=ImageFont.load_default()
 for i,(n,c) in enumerate(zip(nums,cards)):
     c=c.resize((tw,th),Image.LANCZOS)
     x=gap+i*(tw+gap); sheet.paste(c,(x,gap),c)

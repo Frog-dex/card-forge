@@ -11,8 +11,9 @@ import os, json
 from PIL import Image, ImageDraw, ImageFont
 from marble_render import render_marble, card_seed, load_manifest
 import corner_badges as cb
+from forge_paths import FORGE_ROOT
 
-ROOT = "/Users/blu/card-borders/poker-deck"
+ROOT = FORGE_ROOT
 OUT  = os.path.join(ROOT, "marbles"); os.makedirs(OUT, exist_ok=True)
 D    = cb.D                      # 286 — matches placement size (WYSIWYG, no resize)
 AMP, BANDS = 0.22, 2.8           # locked middle intensity
@@ -36,7 +37,7 @@ def engrave_symbol(marble, elem, base):
     return marble
 
 def engrave_number(marble, label, base):
-    font = ImageFont.truetype(cb.FONT, int(D * 0.5))
+    font = ImageFont.truetype(cb.FONT, int(D * 0.5)) if cb.FONT else ImageFont.load_default(int(D * 0.5))
     tmp = Image.new("L", (D, D), 0)
     ImageDraw.Draw(tmp).text((D // 2, D // 2), label, font=font, fill=255, anchor="mm")
     bb = tmp.getbbox()

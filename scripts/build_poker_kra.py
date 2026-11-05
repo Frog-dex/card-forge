@@ -7,7 +7,7 @@ import os, json
 from krita import Krita
 from PyQt5.QtCore import QByteArray
 
-ROOT = os.environ.get("SS_ROOT", "/Users/blu/card-borders/poker-deck")
+ROOT = os.environ.get("SS_ROOT", os.environ.get("CARD_FORGE_ROOT", "/Users/blu/card-borders/poker-deck"))
 BORD = os.path.join(ROOT, "borders")
 ART  = os.path.join(ROOT, "art")
 BADGES = os.path.join(ROOT, "badges")

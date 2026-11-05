@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Card Inspector — Card Forge</title>
+<meta name="description" content="Inspect any Spirit Strikers card at print resolution with trim, safe-area and art-window guides.">
+<meta name="theme-color" content="#141416">
+<link rel="icon" href="elements/emblem_spirit.png">
+<link rel="stylesheet" href="assets/forge.css">
+<style>
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;padding-top:26px;padding-bottom:50px;align-items:start}
+  .viewer{position:sticky;top:76px;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .viewer .cardthumb{width:min(100%,calc((100vh - 190px) * 1650 / 2250),560px);
+    box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 0 1px color-mix(in srgb,var(--c,#555) 50%,transparent),0 0 80px color-mix(in srgb,var(--c,#555) 25%,transparent)}
+  .viewer .cardthumb.trim{aspect-ratio:1500/2100}
+  .pager{display:flex;gap:10px;align-items:center}
+  .pager b{font:700 20px var(--display);min-width:90px;text-align:center}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .panel+.panel{margin-top:14px}
+  .panel h3{font-size:14px;font-family:var(--font);text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:12px}
+  .title{font:700 28px/1.1 var(--display);color:var(--c);margin:0}
+  .sub{color:var(--muted);margin:4px 0 0}
+  .picker{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .picker button{aspect-ratio:1650/2250;border-radius:5px;border:1px solid rgba(255,255,255,.06);cursor:pointer;
+    background:color-mix(in srgb,var(--c) 70%,#111);color:#fff;font-size:11px;font-weight:700;text-shadow:0 1px 2px #000;padding:0}
+  .picker button.blank{background:color-mix(in srgb,var(--c) 22%,#151518);color:#aaa}
+  .picker button[aria-current=true]{outline:2px solid var(--gold);outline-offset:1px}
+  .ctrls{display:flex;flex-wrap:wrap;gap:8px}
+  dl.spec{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:13px}
+  dl.spec dt{color:var(--muted)}
+  dl.spec dd{margin:0;font-variant-numeric:tabular-nums}
+  .legend{display:flex;flex-direction:column;gap:6px;font-size:13px;margin-top:12px}
+  .legend span{display:flex;align-items:center;gap:8px}
+  .legend i{width:22px;height:0;border-top:3px solid var(--k)}
+  .orbs{display:flex;gap:12px;align-items:center}
+  .orbs img{width:72px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+  .note{font-size:12px;color:var(--muted);margin:10px 0 0}
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr}
+    .viewer{position:static}
+    .viewer .cardthumb{width:min(100%,420px)}
+  }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="brand" href="index.html"><img src="elements/emblem_spirit.png" alt="">Card Forge</a>
+  <a class="tab" href="index.html">Home</a>
+  <a class="tab" href="deck-editor.html">Deck Editor</a>
+  <a class="tab" href="inspector.html" aria-current="page">Card Inspector</a>
+  <a class="tab" href="marbles.html">Marbles</a>
+</nav>
+<main class="wrap layout">
+  <div class="viewer">
+    <div class="cardthumb" id="frame"><canvas id="cv" width="825" height="1125" aria-label="Card preview"></canvas></div>
+    <div class="pager">
+      <button class="btn" id="prev" aria-label="Previous card">←</button>
+      <b id="numLbl">#01</b>
+      <button class="btn" id="next" aria-label="Next card">→</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel">
+      <p class="title" id="title">…</p>
+      <p class="sub" id="sub"></p>
+      <div class="orbs" style="margin-top:14px"><img id="mTop" alt="Symbol marble"><img id="mBot" alt="Number marble">
+        <img id="emb" alt="Faction emblem" style="width:64px;margin-left:auto"></div>
+    </div>
+
+    <div class="panel">
+      <h3>View</h3>
+      <div class="ctrls">
+        <div class="seg"><button class="btn" id="mLight">Light</button><button class="btn on" id="mDark">Dark</button></div>
+        <button class="btn" id="tGuides" aria-pressed="false">Guides</button>
+        <button class="btn" id="tTrim" aria-pressed="false">Trim to cut</button>
+        <button class="btn primary" id="dl">⬇ 600 DPI PNG</button>
+      </div>
+      <div class="legend" id="legend" hidden>
+        <span style="--k:#ff00c8"><i></i>Trim — the cut line (2.5 × 3.5 in)</span>
+        <span style="--k:#00dcff"><i></i>Safe area — keep text and faces inside</span>
+        <span style="--k:#ffdc00"><i></i>Art window — where the line art sits</span>
+      </div>
+      <p class="note" id="artNote" hidden>Line art for this card isn't bundled (Blu's original drawings). Drop
+        <code id="artFile"></code> into <code>sample-art/</code>, or open this page with <code>?art=path/to/cutouts/</code>.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Jump to card</h3>
+      <div class="picker" id="picker"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Print spec</h3>
+      <dl class="spec" id="spec"></dl>
+    </div>
+  </div>
+</main>
+
+<script src="assets/forge.js"></script>
+<script>
+(async()=>{
+  const {plan,factions}=await Forge.load();
+  const fac=Object.fromEntries(factions.map(f=>[f.key,f]));
+  const cells=[...plan.cells].sort((a,b)=>a.num-b.num);
+  let num=1, mode="dark", guides=false, trim=false;
+  const $=id=>document.getElementById(id);
+
+  // mini 7x7 picker
+  const pk=$("picker");
+  cells.forEach(c=>{
+    const b=document.createElement("button"); b.textContent=c.num; b.style.setProperty("--c",c.hex);
+    if(!c.card) b.className="blank";
+    b.title=`#${c.num} ${c.category} · ${c.element}${c.card?" · "+c.card:" · blank"}`;
+    b.onclick=()=>go(c.num); pk.appendChild(b);
+  });
+
+  const inch=px=>(px/600).toFixed(3).replace(/0+$/,"").replace(/\.$/,"")+" in";
+  function spec(c){
+    const W=Forge.WIN, rows=[
+      ["Canvas",`1650 × 2250 px · ${inch(1650)} × ${inch(2250)}`],
+      ["Trim (cut)","1500 × 2100 px · 2.5 × 3.5 in"],
+      ["Bleed","75 px · 1/8 in each side"],
+      ["Safe area","1350 × 1950 px · 1/8 in inside trim"],
+      ["Art window",`${W[2]-W[0]} × ${W[3]-W[1]} px · r = 60 px`],
+      ["Resolution","600 DPI · RGBA"],
+      ["Marbles","286 px Ø · top-left + bottom-right"],
+    ];
+    if(c.art) rows.push(["Art placement",`${c.art.w} × ${c.art.h} px at (${c.art.x}, ${c.art.y})`]);
+    $("spec").innerHTML=rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("");
+  }
+
+  async function show(){
+    const c=cells.find(x=>x.num===num), f=fac[c.element];
+    document.documentElement.style.setProperty("--c",f.hex);
+    $("numLbl").textContent="#"+Forge.pad2(num);
+    $("title").textContent=c.card?(c.card.startsWith("element-")?`${f.name} emblem`:c.card):"Blank card";
+    const artFac=c.faction&&c.faction!==c.element?` · art from the ${fac[c.faction]?.name||c.faction} faction`:"";
+    $("sub").textContent=`${c.category} · ${f.name} (${f.animal}) column${artFac}`;
+    $("mTop").src=Forge.urls.marble(num,"top"); $("mBot").src=Forge.urls.marble(num,"bot"); $("emb").src=Forge.urls.emblem(c.element);
+    pk.querySelectorAll("button").forEach((b,i)=>b.setAttribute("aria-current",cells[i].num===num));
+    spec(c);
+    const cv=$("cv"); $("frame").classList.toggle("trim",trim);
+    cv.width=trim?750:825; cv.height=trim?1050:1125;
+    const r=await Forge.drawCard(cv,c,{mode,guides,trim});
+    const missing=c.card&&!c.card.startsWith("element-")&&!r.hasArt;
+    $("artNote").hidden=!missing; if(missing) $("artFile").textContent=c.card+".png";
+    if(location.hash!=="#"+num) history.replaceState(null,"","#"+num);
+  }
+  function go(n){num=((n-1+49)%49)+1;show();}
+
+  $("prev").onclick=()=>go(num-1); $("next").onclick=()=>go(num+1);
+  addEventListener("keydown",e=>{if(e.target.closest("input"))return; if(e.key==="ArrowLeft")go(num-1); if(e.key==="ArrowRight")go(num+1);});
+  // swipe on touch
+  let sx=null; $("frame").addEventListener("touchstart",e=>{sx=e.touches[0].clientX;},{passive:true});
+  $("frame").addEventListener("touchend",e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)go(num+(dx<0?1:-1));sx=null;});
+
+  const setMode=m=>{mode=m;$("mLight").classList.toggle("on",m==="light");$("mDark").classList.toggle("on",m==="dark");show();};
+  $("mLight").onclick=()=>setMode("light"); $("mDark").onclick=()=>setMode("dark");
+  $("tGuides").onclick=e=>{guides=!guides;e.currentTarget.classList.toggle("on",guides);e.currentTarget.setAttribute("aria-pressed",guides);$("legend").hidden=!guides;show();};
+  $("tTrim").onclick=e=>{trim=!trim;e.currentTarget.classList.toggle("on",trim);e.currentTarget.setAttribute("aria-pressed",trim);show();};
+  $("dl").onclick=async()=>{
+    const c=cells.find(x=>x.num===num), out=document.createElement("canvas");
+    out.width=trim?1500:1650; out.height=trim?2100:2250;
+    await Forge.drawCard(out,c,{mode,guides,trim,round:false,placeholder:false});
+    out.toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);
+      a.download=`SS_${Forge.pad2(num)}_${c.category.replace(/\s+/g,"-")}_${c.element}${trim?"_trim":""}.png`;a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),4000);});
+  };
+  addEventListener("hashchange",()=>{const n=parseInt(location.hash.slice(1));if(n>=1&&n<=49&&n!==num){num=n;show();}});
+
+  const h=parseInt(location.hash.slice(1)); if(h>=1&&h<=49) num=h;
+  show();
+})();
+</script>
+</body>
+</html>

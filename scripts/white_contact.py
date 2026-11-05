@@ -4,8 +4,9 @@ line drawings), with the colored border + corner marbles kept. For review/workin
 import os, json
 from PIL import Image, ImageDraw, ImageFont
 from corner_badges import make_badge
+from forge_paths import FORGE_ROOT
 
-ROOT="/Users/blu/card-borders/poker-deck"; BORD=ROOT+"/borders"; ARTDIR=ROOT+"/art"
+ROOT=FORGE_ROOT; BORD=ROOT+"/borders"; ARTDIR=ROOT+"/art"
 P=json.load(open(ROOT+"/plan.json")); ROWS=P["rows"]; COLS=P["cols"]
 TW=240; TH=round(TW*2250/1650); PAD=16; LBLH=34; GUT=140; TOP=84
 SW=GUT+7*(TW+PAD)+PAD; SH=TOP+7*(TH+LBLH+PAD)+PAD
@@ -14,7 +15,7 @@ def font(sz):
     for p in ["/System/Library/Fonts/Supplemental/Arial.ttf"]:
         if os.path.exists(p):
             try: return ImageFont.truetype(p,sz)
-            except: pass
+            except Exception: pass
     return ImageFont.load_default()
 F=font(20); Fs=font(15); Fh=font(26)
 bcache={k:Image.open(BORD+f"/border_{k}.png").convert("RGBA").resize((TW,TH),Image.LANCZOS) for k in COLS}

@@ -3,11 +3,12 @@
 import os, json
 from PIL import Image, ImageDraw, ImageFont
 from corner_badges import make_badge
+from forge_paths import FORGE_ROOT, DECK_ROOT
 
-ROOT="/Users/blu/card-borders/poker-deck"
+ROOT=FORGE_ROOT
 BORD=os.path.join(ROOT,"borders")
-ARTSRC="/Users/blu/spirit-strikers-deck/images/cards-bw-cutout"
-ARTDIR="/Users/blu/card-borders/poker-deck/art"
+ARTSRC=os.path.join(DECK_ROOT, "images/cards-bw-cutout")
+ARTDIR=os.path.join(FORGE_ROOT, "art")
 P=json.load(open(os.path.join(ROOT,"plan.json")))
 cells=P["cells"]; ROWS=P["rows"]; COLS=P["cols"]
 
@@ -22,7 +23,7 @@ def font(sz):
               "/System/Library/Fonts/Helvetica.ttc"]:
         if os.path.exists(p):
             try: return ImageFont.truetype(p,sz)
-            except: pass
+            except Exception: pass
     return ImageFont.load_default()
 F=font(20); Fs=font(15); Fh=font(26)
 

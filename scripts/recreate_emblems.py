@@ -9,8 +9,9 @@ Outputs elements/v2/emblem_<elem>.png (768px, transparent) + _emblems-v2.png mon
 import os, math
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from forge_paths import FORGE_ROOT
 
-ROOT="/Users/blu/card-borders/poker-deck"
+ROOT=FORGE_ROOT
 ELEMDIR=os.path.join(ROOT,"elements"); V2=os.path.join(ELEMDIR,"v2"); os.makedirs(V2,exist_ok=True)
 HEX={"water":"#1c6baf","wood":"#85dc7b","electric":"#d3cf61","fire":"#c22c37","metal":"#c9ccd2","earth":"#684a36","spirit":"#64318f"}
 ORDER=["water","wood","electric","fire","metal","earth","spirit"]
@@ -62,7 +63,7 @@ def build(elem):
     return out
 
 try: F=ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial.ttf",16)
-except: F=ImageFont.load_default()
+except Exception: F=ImageFont.load_default()
 cell=200
 mont=Image.new("RGB",(cell*7,cell+26),(40,40,44)); md=ImageDraw.Draw(mont)
 for i,e in enumerate(ORDER):
