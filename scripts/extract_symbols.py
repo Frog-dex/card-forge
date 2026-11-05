@@ -5,8 +5,9 @@ Used to deboss the element symbol into the top-left corner marble."""
 import os
 import numpy as np
 from PIL import Image, ImageFilter
+from forge_paths import FORGE_ROOT
 
-ELEMDIR="/Users/blu/card-borders/poker-deck/elements"
+ELEMDIR=os.path.join(FORGE_ROOT, "elements")
 ELEMS=["water","wood","metal","electric","fire","earth","spirit"]
 
 def extract(elem):
@@ -36,7 +37,7 @@ cell=160; m=Image.new("RGB",(cell*7,cell+24),(230,230,230))
 from PIL import ImageDraw,ImageFont
 d=ImageDraw.Draw(m)
 try: f=ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial.ttf",16)
-except: f=ImageFont.load_default()
+except Exception: f=ImageFont.load_default()
 for i,e in enumerate(ELEMS):
     g=extract(e)
     if g:
@@ -45,5 +46,5 @@ for i,e in enumerate(ELEMS):
         blk=Image.new("RGBA",g2.size,(20,20,20,255)); blk.putalpha(g2.getchannel("A"))
         m.paste(blk,(i*cell+15,12),blk)
     d.text((i*cell+cell//2,cell+6),e,font=f,fill=(40,40,40),anchor="ma")
-m.save("/Users/blu/card-borders/poker-deck/_symbols_montage.png")
+m.save(os.path.join(FORGE_ROOT, "_symbols_montage.png"))
 print("symbols extracted ->", ELEMDIR, "| montage _symbols_montage.png")

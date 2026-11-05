@@ -12,8 +12,9 @@ import os, json
 import numpy as np
 from PIL import Image
 from marble_render import render_marble, card_seed, load_manifest
+from forge_paths import FORGE_ROOT
 
-ROOT = "/Users/blu/card-borders/poker-deck"
+ROOT = FORGE_ROOT
 OUT  = os.path.join(ROOT, "_kra49"); os.makedirs(OUT, exist_ok=True)
 
 MARB, PAD = 480, 60

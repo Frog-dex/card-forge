@@ -6,14 +6,15 @@ build_poker_borders.py (PNG + BGRA + borders_manifest.json)."""
 import os, json
 import numpy as np
 from PIL import Image, ImageDraw, ImageChops, ImageFilter
+from forge_paths import FORGE_ROOT
 
 DPI=600; W,H=1650,2250; BLEED=75; SAFE=75
 TRIM=(BLEED,BLEED,W-BLEED,H-BLEED); SAFEB=(BLEED+SAFE,BLEED+SAFE,W-BLEED-SAFE,H-BLEED-SAFE)
 TRIM_R=84; BORDER=44
 WIN=(BLEED+BORDER,BLEED+BORDER,W-BLEED-BORDER,H-BLEED-BORDER); WIN_R=60
 SS=2
-OUT="/Users/blu/card-borders/poker-deck/borders"
-ASSET="/Users/blu/card-borders/poker-deck/site-assets"
+OUT=os.path.join(FORGE_ROOT, "borders")
+ASSET=os.path.join(FORGE_ROOT, "site-assets")
 os.makedirs(OUT,exist_ok=True)
 
 # Element palette sampled from the canonical gem sheet fbn-0543.jpg

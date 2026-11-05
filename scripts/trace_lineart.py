@@ -6,12 +6,13 @@ CLI: trace_lineart.py <card-id> [thin_px]  -> writes _VECTOR-compare-<id>.png
 """
 import os, sys
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 import potrace
 from scipy import ndimage
+from forge_paths import FORGE_ROOT, DECK_ROOT
 
-CUT="/Users/blu/spirit-strikers-deck/images/cards-bw-cutout"
-ROOT="/Users/blu/card-borders/poker-deck"
+CUT=os.path.join(DECK_ROOT, "images/cards-bw-cutout")
+ROOT=FORGE_ROOT
 
 def bez(p0,p1,p2,p3,n=16):
     t=np.linspace(0,1,n)[:,None]
@@ -70,7 +71,7 @@ def compare(cid, thin=0):
     pad=30; W=tw*2+pad*3; H=th+90
     sheet=Image.new("RGB",(W,H),(255,255,255)); d=ImageDraw.Draw(sheet)
     try: f=ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Bold.ttf",30)
-    except: f=ImageFont.load_default()
+    except Exception: f=ImageFont.load_default()
     for i,(m,lab) in enumerate([(old,"CURRENT (pixel upscale)"),(new,f"VECTOR-TRACED (thin={thin})")]):
         ink=Image.new("RGBA",(tw,th),(15,15,15,255)); ink.putalpha(m)
         x=pad+i*(tw+pad); sheet.paste(ink,(x,70),ink)

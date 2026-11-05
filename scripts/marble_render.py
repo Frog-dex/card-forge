@@ -25,8 +25,9 @@ Pure stdlib + numpy + Pillow. No external image assets — the orb is 100% coded
 import os, math, json, hashlib
 import numpy as np
 from PIL import Image
+from forge_paths import FORGE_ROOT
 
-BORD = "/Users/blu/card-borders/poker-deck/borders"
+BORD = os.path.join(FORGE_ROOT, "borders")
 
 # ---- locked deck-wide constants ------------------------------------------------
 LIGHT = np.array([-0.50, -0.58, 0.64])      # key light: upper-LEFT, slightly front (image y is DOWN)

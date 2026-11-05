@@ -2,19 +2,20 @@
 """Build the 49-cell (7 category x 7 element) plan and precompute placed art BGRA.
 Each card is colored by ITS element; blanks fill remaining cells colored by the
 column element. Writes plan.json + art/<id>.bgra for the assembler."""
-import os, json, struct
+import os, json
 import numpy as np
 from PIL import Image
+from forge_paths import FORGE_ROOT, DECK_ROOT
 
-ROOT = "/Users/blu/card-borders/poker-deck"
-ARTSRC = "/Users/blu/spirit-strikers-deck/images/cards-vector"    # vector-traced crisp line art (bake_vector_art.py)
-ARTSRC_FALLBACK = "/Users/blu/spirit-strikers-deck/images/cards-bw-cutout"
+ROOT = FORGE_ROOT
+ARTSRC = os.path.join(DECK_ROOT, "images/cards-vector")    # vector-traced crisp line art (bake_vector_art.py)
+ARTSRC_FALLBACK = os.path.join(DECK_ROOT, "images/cards-bw-cutout")
 ARTOUT = os.path.join(ROOT, "art"); os.makedirs(ARTOUT, exist_ok=True)
 ELEMDIR = os.path.join(ROOT, "elements")   # the 7 gem emblems cropped from fbn-0543.jpg
-_catpaths = ["/Users/blu/card-borders/poker-deck/card-categories.json",
+_catpaths = [os.path.join(FORGE_ROOT, "card-categories.json"),
              "/Users/blu/Downloads/spirit-strikers-card-categories.json"]
 CATS = json.load(open(next(p for p in _catpaths if os.path.exists(p))))
-PLANS = json.load(open("/Users/blu/spirit-strikers-deck/content/card-plans.json"))
+PLANS = json.load(open(os.path.join(DECK_ROOT, "content/card-plans.json")))
 BM = json.load(open(os.path.join(ROOT, "borders/borders_manifest.json")))
 WIN = BM["window"]; W,H = BM["canvas"]
 winW, winH = WIN[2]-WIN[0], WIN[3]-WIN[1]

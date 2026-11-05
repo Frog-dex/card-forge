@@ -1,0 +1,6 @@
+# Build-script dependencies (the web pages need nothing — they are static HTML).
+numpy>=1.26
+Pillow>=10.1
+scipy>=1.11       # deck_variant.py, trace_lineart.py
+potracer>=0.0.4   # trace_lineart.py, bake_vector_art.py (pure-Python potrace)
+PyMuPDF>=1.23     # extract_crops_pdf.py

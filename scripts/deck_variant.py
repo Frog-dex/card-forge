@@ -4,22 +4,21 @@
   BLACK version -> dark  interior, cutout line art = WHITE
 The colored parts (element gem emblems, marble borders, corner marbles) are
 IDENTICAL on both. Writes _DECK-WHITE.png and _DECK-BLACK.png."""
-import os, json
-import numpy as np
-from scipy import ndimage
+import json
 from PIL import Image, ImageDraw, ImageFont
 from corner_badges import make_badge
+from forge_paths import FORGE_ROOT
 
 THIN={"Locations":2}   # extra line-thinning for detailed/scene rows (px of erosion); default 1
 
-ROOT="/Users/blu/card-borders/poker-deck"; BORD=ROOT+"/borders"; ARTDIR=ROOT+"/art"
+ROOT=FORGE_ROOT; BORD=ROOT+"/borders"; ARTDIR=ROOT+"/art"
 P=json.load(open(ROOT+"/plan.json")); ROWS=P["rows"]; COLS=P["cols"]
 TW=240; TH=round(TW*2250/1650); PAD=16; LBLH=34; GUT=140; TOP=84
 SW=GUT+7*(TW+PAD)+PAD; SH=TOP+7*(TH+LBLH+PAD)+PAD
 def font(sz):
     p="/System/Library/Fonts/Supplemental/Arial.ttf"
     try: return ImageFont.truetype(p,sz)
-    except: return ImageFont.load_default()
+    except Exception: return ImageFont.load_default()
 F=font(20); Fs=font(15); Fh=font(26)
 bcache={k:Image.open(BORD+f"/border_{k}.png").convert("RGBA").resize((TW,TH),Image.LANCZOS) for k in COLS}
 badgecache={c["num"]:make_badge(c["num"],c["element"]).resize((TW,TH),Image.LANCZOS) for c in P["cells"]}

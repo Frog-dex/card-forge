@@ -5,19 +5,19 @@ make_badge(num, elem_key) -> full-canvas RGBA (1650x2250):
   BOTTOM-RIGHT marble = the NUMBER (debossed)
 Both upright. Marbles fuse into the corner border (outer edge ~0.5mm inside cut)."""
 import os
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from forge_paths import FORGE_ROOT, find_font
 
 W,H=1650,2250
 BLEED=75; BORDER=44; SAFEM=75
 WIN=(BLEED+BORDER,BLEED+BORDER,W-BLEED-BORDER,H-BLEED-BORDER)
 SAFE=(BLEED+SAFEM,BLEED+SAFEM,W-BLEED-SAFEM,H-BLEED-SAFEM)
-BORD="/Users/blu/card-borders/poker-deck/borders"
-ELEMDIR="/Users/blu/card-borders/poker-deck/elements"
+BORD=os.path.join(FORGE_ROOT, "borders")
+ELEMDIR=os.path.join(FORGE_ROOT, "elements")
 D=286                      # marble diameter (+10%, nestled into the corner border)
 SAFEGAP=5                  # marble outer edge ~0.2mm inside trim -> hugs the corner, covers the dark window, no crop
 TRIM_OFF=BLEED+SAFEGAP     # 87px from canvas edge
-FONT="/System/Library/Fonts/Supplemental/Arial Rounded Bold.ttf"
+FONT=find_font("/System/Library/Fonts/Supplemental/Arial Rounded Bold.ttf")
 
 def hx(h): h=h.lstrip("#"); return tuple(int(h[i:i+2],16) for i in (0,2,4))
 def dark(c,f): return tuple(int(v*(1-f)) for v in c)
@@ -45,7 +45,7 @@ def _deboss(badge, alpha, base, target):
 
 def marble_number(elem_key, label):
     badge, base=_marble(elem_key)
-    try: font=ImageFont.truetype(FONT,int(D*0.5))
+    try: font=ImageFont.truetype(FONT,int(D*0.5)) if FONT else ImageFont.load_default(int(D*0.5))
     except Exception: font=ImageFont.load_default()
     tmp=Image.new("L",(D,D),0)
     ImageDraw.Draw(tmp).text((D//2,D//2),label,font=font,fill=255,anchor="mm")
@@ -62,7 +62,7 @@ def marble_symbol(elem_key):
         if bbox: _deboss(badge, a.crop(bbox), base, int(D*0.56))
     return badge
 
-MARBLES="/Users/blu/card-borders/poker-deck/marbles"   # per-card unique marbles (build_marbles_98.py)
+MARBLES=os.path.join(FORGE_ROOT, "marbles")   # per-card unique marbles (build_marbles_98.py)
 def _card_marble(num, slot):
     """Load the pre-baked unique marble for this card+slot, or None to fall back."""
     p=os.path.join(MARBLES,f"{num:02d}_{slot}.png")
@@ -89,5 +89,5 @@ if __name__=="__main__":
     base.alpha_composite(Image.open(os.path.join(BORD,f"border_{elem}.png")).convert("RGBA"))
     base.alpha_composite(make_badge(num,elem))
     base.thumbnail((520,720),Image.LANCZOS)
-    out="/Users/blu/card-borders/poker-deck/_PROTO-corner-49.png"
+    out=os.path.join(FORGE_ROOT, "_PROTO-corner-49.png")
     base.convert("RGB").save(out); print("wrote",out,base.size)

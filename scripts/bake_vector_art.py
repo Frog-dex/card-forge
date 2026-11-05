@@ -7,10 +7,11 @@ import os, json, time
 import numpy as np
 from PIL import Image
 from trace_lineart import render_vector
+from forge_paths import FORGE_ROOT, DECK_ROOT
 
-CUT="/Users/blu/spirit-strikers-deck/images/cards-bw-cutout"
-OUT="/Users/blu/spirit-strikers-deck/images/cards-vector"; os.makedirs(OUT,exist_ok=True)
-ROOT="/Users/blu/card-borders/poker-deck"
+CUT=os.path.join(DECK_ROOT, "images/cards-bw-cutout")
+OUT=os.path.join(DECK_ROOT, "images/cards-vector"); os.makedirs(OUT,exist_ok=True)
+ROOT=FORGE_ROOT
 
 plan=json.load(open(os.path.join(ROOT,"plan.json")))
 cat_of={c["card"]:c["category"] for c in plan["cells"] if c.get("card") and str(c["card"]).startswith("card-")}

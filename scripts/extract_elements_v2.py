@@ -5,6 +5,7 @@ transparent. Saves elements/emblem_<elem>.png + _emblems_montage.png."""
 import os
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from forge_paths import FORGE_ROOT
 
 SRC="/tmp/fbn-0543.jpg"
 if not os.path.exists(SRC):
@@ -15,7 +16,7 @@ W,Hh=im.size
 arr=np.asarray(im)
 GEMS={"fire":(0.50,0.13),"metal":(0.20,0.32),"electric":(0.80,0.33),"spirit":(0.50,0.46),
       "earth":(0.20,0.66),"wood":(0.80,0.66),"water":(0.50,0.83)}
-OUT="/Users/blu/card-borders/poker-deck/elements"; os.makedirs(OUT,exist_ok=True)
+OUT=os.path.join(FORGE_ROOT, "elements"); os.makedirs(OUT,exist_ok=True)
 half=int(0.168*W)     # wide enough for the full hexagon, just short of neighbours
 
 def crop(elem,fx,fy):
@@ -32,10 +33,10 @@ def crop(elem,fx,fy):
 cell=200; ORDER=["water","wood","metal","electric","fire","earth","spirit"]
 m=Image.new("RGB",(cell*7,cell+26),(220,220,220)); d=ImageDraw.Draw(m)
 try: f=ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial.ttf",16)
-except: f=ImageFont.load_default()
+except Exception: f=ImageFont.load_default()
 for i,e in enumerate(ORDER):
     g=crop(e,*GEMS[e]); g2=g.copy(); g2.thumbnail((cell-16,cell-16))
     m.paste(g2,(i*cell+8,8),g2)
     d.text((i*cell+cell//2,cell+8),e,font=f,fill=(30,30,30),anchor="ma")
-m.save("/Users/blu/card-borders/poker-deck/_emblems_montage.png")
+m.save(os.path.join(FORGE_ROOT, "_emblems_montage.png"))
 print("emblems re-cropped (half=%d) -> %s ; montage _emblems_montage.png"%(half,OUT))
