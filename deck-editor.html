@@ -1,163 +1,244 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Spirit Strikers — Deck Editor</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deck Editor — Card Forge</title>
+<meta name="description" content="Drag-and-drop editor for the 49-card Spirit Strikers deck.">
+<meta name="theme-color" content="#141416">
+<link rel="icon" href="elements/emblem_spirit.png">
+<link rel="stylesheet" href="assets/forge.css">
 <style>
-  :root{--bg:#141416;--panel:#1e1e22;--ink:#e8e4dc;--gold:#c9a24a;}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 -apple-system,Segoe UI,Arial}
-  header{position:sticky;top:0;z-index:10;background:var(--panel);padding:10px 14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #333}
-  header b{color:var(--gold);font-size:16px;margin-right:6px}
-  button,label{font:13px inherit}
-  button{background:#2a2a30;color:var(--ink);border:1px solid #444;border-radius:7px;padding:7px 11px;cursor:pointer}
-  button:hover{border-color:var(--gold)}
-  button.on{background:var(--gold);color:#1a1505;border-color:var(--gold)}
-  .seg{display:inline-flex;border:1px solid #444;border-radius:8px;overflow:hidden}
-  .seg button{border:none;border-radius:0}
-  input[type=range]{accent-color:var(--gold);vertical-align:middle}
-  #hint{color:#9a978f;font-size:12px}
-  #grid{display:grid;grid-template-columns:120px repeat(7,1fr);gap:8px;padding:14px;max-width:1500px}
-  .colh{ text-align:center;font-weight:700;font-size:12px;letter-spacing:.5px;padding-bottom:2px}
-  .rowh{display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#cfc8ba;font-size:13px}
-  .cell{position:relative;border-radius:9px}
+  .toolbar{position:sticky;top:53px;z-index:20;display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;
+    padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .toolbar .grp{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .toolbar .btn{padding:7px 11px;font-size:13px}
+  #hint{color:var(--muted);font-size:12px;padding:8px 16px 0}
+  #status{font-size:12px;color:var(--muted)}
+  .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  #grid{display:grid;grid-template-columns:120px repeat(7,minmax(84px,1fr));gap:8px;padding:14px 16px 40px;max-width:1500px;min-width:720px}
+  .colh{text-align:center;font-weight:700;font-size:12px;letter-spacing:.5px;padding-bottom:2px;text-transform:uppercase;
+    display:flex;flex-direction:column;align-items:center;gap:4px}
+  .colh img{width:28px}
+  .rowh{display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#cfc8ba;font-size:13px;text-align:right;
+    position:sticky;left:0;z-index:2;background:linear-gradient(90deg,var(--bg) 80%,transparent)}
+  .cell{position:relative;border-radius:9px;transition:transform .12s}
   .cell canvas{width:100%;display:block;border-radius:9px}
-  .cell .art{position:absolute;inset:0;cursor:grab}
+  .cell .art{position:absolute;inset:0;cursor:grab;border-radius:9px}
   .cell.drag-over{outline:3px dashed var(--gold);outline-offset:2px}
-  .num{position:absolute;left:4px;bottom:2px;font-size:10px;color:#8a8;opacity:.0}
-</style></head>
+  .cell.picked{outline:3px solid var(--gold);outline-offset:2px;transform:scale(.96)}
+  .cell .art:focus-visible{outline:3px solid var(--gold2);outline-offset:2px}
+  @media (max-width:760px){
+    #hint{display:none}
+    .toolbar{top:86px;position:static}
+    #grid{grid-template-columns:72px repeat(7,84px);min-width:0;width:max-content;padding:12px}
+    .rowh{font-size:11px;padding-right:4px}
+  }
+</style>
+</head>
 <body>
-<header>
-  <b>Spirit Strikers — Deck Editor</b>
-  <div class="seg"><button id="mLight">Light</button><button id="mDark" class="on">Dark</button></div>
-  <label>line thickness <input id="thin" type="range" min="40" max="210" value="110"></label>
-  <button id="expL">⬇ Light PNG</button>
-  <button id="expD">⬇ Dark PNG</button>
-  <button id="expJ">⬇ arrangement.json</button>
-  <button id="reset">Reset</button>
-  <span id="hint">drag any artwork onto another card to swap positions — it recolors to the new element. Frames & numbers stay put.</span>
-</header>
-<div id="grid"></div>
+<nav class="nav">
+  <a class="brand" href="index.html"><img src="elements/emblem_spirit.png" alt="">Card Forge</a>
+  <a class="tab" href="index.html">Home</a>
+  <a class="tab" href="deck-editor.html" aria-current="page">Deck Editor</a>
+  <a class="tab" href="inspector.html">Card Inspector</a>
+  <a class="tab" href="marbles.html">Marbles</a>
+</nav>
+<div class="toolbar">
+  <div class="grp">
+    <div class="seg"><button class="btn" id="mLight">Light</button><button class="btn on" id="mDark">Dark</button></div>
+    <label class="ctl">line thickness <input id="thin" type="range" min="40" max="210" value="110"></label>
+  </div>
+  <div class="grp">
+    <button class="btn" id="undo" disabled>↶ Undo</button>
+    <button class="btn" id="reset">Reset</button>
+    <button class="btn" id="loadArt" title="Pick line-art PNGs named card-NN.png">📁 Load art…</button>
+    <button class="btn" id="impJ">⇪ Import arrangement</button>
+  </div>
+  <div class="grp">
+    <button class="btn" id="expL">⬇ Light PNG</button>
+    <button class="btn" id="expD">⬇ Dark PNG</button>
+    <button class="btn primary" id="expJ">⬇ arrangement.json</button>
+  </div>
+  <span id="status"></span>
+  <input type="file" id="artFiles" accept="image/png" multiple hidden>
+  <input type="file" id="jsonFile" accept="application/json,.json" hidden>
+</div>
+<p id="hint">Drag any artwork onto another card — or tap one card, then another — to swap positions. Art recolours to its new element; frames and numbered marbles stay put.</p>
+<div class="scroller"><div id="grid"></div></div>
 
+<script src="assets/forge.js"></script>
 <script>
-const ROOT="./", CUT="../../spirit-strikers-deck/images/cards-vector/";
-const CW=1650, CH=2250, BLEED=75, BORDER=44;
-const WIN=[BLEED+BORDER,BLEED+BORDER,CW-BLEED-BORDER,CH-BLEED-BORDER];
+const CW=Forge.CW, CH=Forge.CH, BLEED=Forge.BLEED;
 const CARDW=210, CARDH=Math.round(CARDW*CH/CW), S=CARDW/CW;
-const ELEMHEX={water:"#1c6baf",wood:"#85dc7b",metal:"#5a6068",electric:"#d3cf61",fire:"#c22c37",earth:"#684a36",spirit:"#64318f"};
-let MODE="dark", THIN=110, plan, cols, rows, cells, artOf={}, imgs={};
+let MODE="dark", THIN=110, plan, cols, rows, cells, ELEMHEX={}, artOf={}, artByCard={}, picked=null;
+const imgs={}, localArt={}, undoStack=[];
+let ART=Forge.artDir();
 
-function loadImg(src){return new Promise(res=>{const i=new Image();i.crossOrigin="anonymous";i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src;});}
+const loadImg=src=>Forge.img(src);
 async function preload(urls){const u=[...new Set(urls)];const arr=await Promise.all(u.map(loadImg));u.forEach((s,i)=>imgs[s]=arr[i]);}
 
-// recolor + thin a line-art cutout to solid color at threshold THIN
-function lineArt(img, col){
-  const c=document.createElement("canvas");c.width=img.width;c.height=img.height;
-  const x=c.getContext("2d");x.drawImage(img,0,0);
-  const d=x.getImageData(0,0,c.width,c.height),p=d.data;
-  const [r,g,b]=col;
-  for(let i=0;i<p.length;i+=4){ if(p[i+3]>THIN){p[i]=r;p[i+1]=g;p[i+2]=b;p[i+3]=255;} else p[i+3]=0; }
-  x.putImageData(d,0,0);return c;
+function artURL(card){
+  if(!card) return null;
+  if(card.startsWith("element-")) return Forge.urls.emblem(card.slice(8));
+  return localArt[card]||ART+card+".png";
 }
-function cardURLs(a){ // image urls needed for artwork id a.card
-  if(!a) return [];
-  if(a.card && a.card.startsWith("element-")) return [ROOT+"elements/emblem_"+a.card.slice(8)+".png"];
-  if(a.card) return [CUT+a.card+".png"];
-  return [];
-}
-function artImg(a){
-  if(!a||!a.card) return null;
-  if(a.card.startsWith("element-")) return imgs[ROOT+"elements/emblem_"+a.card.slice(8)+".png"];
-  return imgs[CUT+a.card+".png"];
-}
+const artImg=a=>a&&a.card?imgs[artURL(a.card)]:null;
 
-function drawCell(cv, r, c){
+function drawCell(cv,r,c){
   const num=r*7+c+1, elem=cols[c], x=cv.getContext("2d");
   const a=artOf[r+"_"+c];
   const isEmb=a&&a.card&&a.card.startsWith("element-");
   x.clearRect(0,0,CARDW,CARDH);
   // interior (emblems always dark; else per mode)
-  x.fillStyle = isEmb ? "#141418" : (MODE==="light"?"#ffffff":"#18181c");
+  x.fillStyle=isEmb?"#141418":(MODE==="light"?"#ffffff":"#18181c");
   roundRect(x,0,0,CARDW,CARDH,9);x.fill();
   // artwork
   if(a&&a.art){
     const im=artImg(a);
     if(im){
       const ax=a.art.x*S, ay=a.art.y*S, aw=a.art.w*S, ah=a.art.h*S;
-      if(isEmb){ x.drawImage(im,ax,ay,aw,ah); }
-      else { const col=MODE==="light"?[18,18,18]:[242,242,242]; x.drawImage(lineArt(im,col),ax,ay,aw,ah); }
+      if(isEmb) x.drawImage(im,ax,ay,aw,ah);
+      else x.drawImage(Forge.ink(im,MODE==="light"?[18,18,18]:[242,242,242],THIN),ax,ay,aw,ah);
+    }else{
+      // art not bundled: faint element glyph marks the slot as "has a card" (blanks stay empty)
+      const sym=imgs[Forge.urls.symbol(elem)];
+      if(sym){const w=CARDW*0.38, h=w*sym.height/sym.width;x.globalAlpha=0.22;
+        x.drawImage(Forge.ink(sym,Forge.hexRGB(ELEMHEX[elem]),20),(CARDW-w)/2,(CARDH-h)/2,w,h);x.globalAlpha=1;}
     }
   }
   // border + marbles (fixed to this position)
-  const bd=imgs[ROOT+"borders/border_"+elem+".png"]; if(bd)x.drawImage(bd,0,0,CARDW,CARDH);
-  const mt=imgs[ROOT+"marbles/"+String(num).padStart(2,"0")+"_top.png"];
-  const mb=imgs[ROOT+"marbles/"+String(num).padStart(2,"0")+"_bot.png"];
-  const D=286*S, off=(BLEED+5)*S;
+  const bd=imgs[Forge.urls.border(elem)]; if(bd)x.drawImage(bd,0,0,CARDW,CARDH);
+  const mt=imgs[Forge.urls.marble(num,"top")], mb=imgs[Forge.urls.marble(num,"bot")];
+  const D=Forge.MARBLE_D*S, off=(BLEED+5)*S;
   if(mt)x.drawImage(mt,off,off,D,D);
   if(mb)x.drawImage(mb,CARDW-off-D,CARDH-off-D,D,D);
 }
 function roundRect(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);x.arcTo(X+W,Y+H,X,Y+H,r);x.arcTo(X,Y+H,X,Y,r);x.arcTo(X,Y,X+W,Y,r);x.closePath();}
 
-function renderAll(){ document.querySelectorAll("canvas[data-rc]").forEach(cv=>{const [r,c]=cv.dataset.rc.split("_").map(Number);drawCell(cv,r,c);}); }
+function renderAll(){document.querySelectorAll("canvas[data-rc]").forEach(cv=>{const [r,c]=cv.dataset.rc.split("_").map(Number);drawCell(cv,r,c);});updateStatus();}
+const qc=rc=>document.querySelector('canvas[data-rc="'+rc+'"]');
+const el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e;};
+const redraw=rc=>drawCell(qc(rc),...rc.split("_").map(Number));
+
+function swap(from,to,record=true){
+  if(!from||from===to) return;
+  const t=artOf[from];artOf[from]=artOf[to];artOf[to]=t;
+  redraw(from);redraw(to);
+  if(record){undoStack.push([from,to]);undoBtn.disabled=false;}
+}
+function clearPick(){if(picked){document.querySelector('.cell[data-rc="'+picked+'"]')?.classList.remove("picked");picked=null;}}
+function tap(rc){
+  if(!picked){picked=rc;document.querySelector('.cell[data-rc="'+rc+'"]').classList.add("picked");return;}
+  const from=picked;clearPick();swap(from,rc);
+}
 
 function build(){
   const g=document.getElementById("grid");g.innerHTML="";
   g.appendChild(el("div",""));
-  cols.forEach(k=>{const d=el("div","colh");d.textContent=k.toUpperCase();d.style.color=ELEMHEX[k];g.appendChild(d);});
+  cols.forEach(k=>{const d=el("div","colh");d.innerHTML=`<img src="${Forge.urls.emblem(k)}" alt="">${k}`;d.style.color=ELEMHEX[k];g.appendChild(d);});
   for(let r=0;r<7;r++){
     const rh=el("div","rowh");rh.textContent=rows[r];g.appendChild(rh);
     for(let c=0;c<7;c++){
-      const cell=el("div","cell");cell.dataset.rc=r+"_"+c;
-      const cv=document.createElement("canvas");cv.width=CARDW;cv.height=CARDH;cv.dataset.rc=r+"_"+c;cell.appendChild(cv);
-      const art=el("div","art");art.draggable=true;art.dataset.rc=r+"_"+c;cell.appendChild(art);
-      art.addEventListener("dragstart",e=>{e.dataTransfer.setData("text",art.dataset.rc);});
+      const rc=r+"_"+c, cell=el("div","cell");cell.dataset.rc=rc;
+      const cv=document.createElement("canvas");cv.width=CARDW;cv.height=CARDH;cv.dataset.rc=rc;cell.appendChild(cv);
+      const art=el("div","art");art.draggable=true;art.dataset.rc=rc;art.tabIndex=0;art.setAttribute("role","button");
+      art.setAttribute("aria-label",`Card ${r*7+c+1}: ${rows[r]}, ${cols[c]}`);
+      cell.appendChild(art);
+      art.addEventListener("dragstart",e=>{clearPick();e.dataTransfer.setData("text",rc);});
+      art.addEventListener("click",()=>tap(rc));
+      art.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();tap(rc);} if(e.key==="Escape")clearPick();});
       cell.addEventListener("dragover",e=>{e.preventDefault();cell.classList.add("drag-over");});
       cell.addEventListener("dragleave",()=>cell.classList.remove("drag-over"));
-      cell.addEventListener("drop",e=>{e.preventDefault();cell.classList.remove("drag-over");
-        const from=e.dataTransfer.getData("text"),to=cell.dataset.rc;
-        if(from&&from!==to){const t=artOf[from];artOf[from]=artOf[to];artOf[to]=t;
-          drawCell(qc(from),...from.split("_").map(Number));drawCell(qc(to),...to.split("_").map(Number));}
-      });
+      cell.addEventListener("drop",e=>{e.preventDefault();cell.classList.remove("drag-over");swap(e.dataTransfer.getData("text"),rc);});
       g.appendChild(cell);
     }
   }
   renderAll();
 }
-const qc=rc=>document.querySelector('canvas[data-rc="'+rc+'"]');
-const el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e;};
 
-// export full deck sheet (mode) to PNG
+function updateStatus(){
+  const want=cells.filter(c=>c.card&&!c.card.startsWith("element-"));
+  const have=want.filter(c=>imgs[artURL(c.card)]).length;
+  document.getElementById("status").textContent=have===want.length?`all ${have} line-art cutouts loaded`
+    :`${have}/${want.length} line-art cutouts found — borders, marbles & emblems shown; use “Load art…” for the rest`;
+}
+
+function download(blob,name){const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),4000);}
+
+// export full deck sheet (mode) to PNG — with row/column labels in the gutters
 function exportSheet(mode){
   const prev=MODE;MODE=mode;
   const TW=CARDW,TH=CARDH,PAD=14,GUT=118,TOP=34,LBL=20;
   const SW=GUT+7*(TW+PAD)+PAD, SH=TOP+7*(TH+LBL+PAD)+PAD;
   const cv=document.createElement("canvas");cv.width=SW;cv.height=SH;const x=cv.getContext("2d");
   x.fillStyle=mode==="light"?"#e8e4dc":"#101012";x.fillRect(0,0,SW,SH);
+  x.font="700 13px system-ui,sans-serif";x.textAlign="center";x.textBaseline="middle";
+  cols.forEach((k,c)=>{x.fillStyle=ELEMHEX[k];x.fillText(k.toUpperCase(),GUT+c*(TW+PAD)+TW/2,TOP/2+2);});
   const tmp=document.createElement("canvas");tmp.width=TW;tmp.height=TH;
-  for(let r=0;r<7;r++)for(let c=0;c<7;c++){drawCell(tmp,r,c);x.drawImage(tmp,GUT+c*(TW+PAD),TOP+r*(TH+LBL+PAD));}
+  for(let r=0;r<7;r++){
+    const y=TOP+r*(TH+LBL+PAD);
+    x.fillStyle=mode==="light"?"#3a3226":"#cfc8ba";x.textAlign="right";x.font="600 13px system-ui,sans-serif";
+    x.fillText(rows[r],GUT-12,y+TH/2);
+    for(let c=0;c<7;c++){
+      drawCell(tmp,r,c);const cx=GUT+c*(TW+PAD);x.drawImage(tmp,cx,y);
+      const a=artOf[r+"_"+c];x.textAlign="center";x.font="11px system-ui,sans-serif";x.fillStyle=mode==="light"?"#6b6458":"#8a877f";
+      x.fillText(`#${r*7+c+1}${a&&a.card?" · "+a.card:""}`,cx+TW/2,y+TH+LBL/2+1);
+    }
+  }
   MODE=prev;
-  cv.toBlob(b=>{const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="DECK-"+mode.toUpperCase()+".png";a.click();});
+  cv.toBlob(b=>download(b,"DECK-"+mode.toUpperCase()+".png"));
 }
-function exportJSON(){
-  const out=[];for(let r=0;r<7;r++)for(let c=0;c<7;c++){const a=artOf[r+"_"+c];out.push({row:r,col:c,num:r*7+c+1,element:cols[c],card:a?a.card:null});}
-  const b=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});const u=URL.createObjectURL(b);
-  const a=document.createElement("a");a.href=u;a.download="arrangement.json";a.click();
+function arrangement(){const out=[];for(let r=0;r<7;r++)for(let c=0;c<7;c++){const a=artOf[r+"_"+c];out.push({row:r,col:c,num:r*7+c+1,element:cols[c],card:a?a.card:null});}return out;}
+function exportJSON(){download(new Blob([JSON.stringify(arrangement(),null,2)],{type:"application/json"}),"arrangement.json");}
+
+function importJSON(list){
+  if(!Array.isArray(list)) throw new Error("expected an array");
+  for(const it of list){
+    if(typeof it.row!=="number"||typeof it.col!=="number") continue;
+    artOf[it.row+"_"+it.col]=it.card?{card:it.card,art:artByCard[it.card]}:null;
+  }
+  undoStack.length=0;undoBtn.disabled=true;renderAll();
 }
 
 async function init(){
-  plan=await (await fetch(ROOT+"plan.json")).json();
-  cols=plan.cols;rows=plan.rows;cells=plan.cells;
-  cells.forEach(c=>{artOf[c.row+"_"+c.col]=c.card?{card:c.card,art:c.art}:null;});
+  const d=await Forge.load();
+  plan=d.plan;cols=plan.cols;rows=plan.rows;cells=plan.cells;
+  d.factions.forEach(f=>ELEMHEX[f.key]=f.hex);
+  cells.forEach(c=>{if(c.card)artByCard[c.card]=c.art;});
   const urls=[];
-  cols.forEach(k=>urls.push(ROOT+"borders/border_"+k+".png"));
-  for(let n=1;n<=49;n++){urls.push(ROOT+"marbles/"+String(n).padStart(2,"0")+"_top.png",ROOT+"marbles/"+String(n).padStart(2,"0")+"_bot.png");}
-  cells.forEach(c=>cardURLs(c.card?{card:c.card}:null).forEach(u=>urls.push(u)));
+  cols.forEach(k=>urls.push(Forge.urls.border(k),Forge.urls.symbol(k)));
+  for(let n=1;n<=49;n++) urls.push(Forge.urls.marble(n,"top"),Forge.urls.marble(n,"bot"));
+  cells.forEach(c=>{const u=artURL(c.card);if(u)urls.push(u);});
   await preload(urls);
-  build();
+  resetArt();build();
 }
-document.getElementById("mLight").onclick=()=>{MODE="light";toggle();renderAll();};
-document.getElementById("mDark").onclick=()=>{MODE="dark";toggle();renderAll();};
-function toggle(){mLight.classList.toggle("on",MODE==="light");mDark.classList.toggle("on",MODE==="dark");}
-document.getElementById("thin").oninput=e=>{THIN=+e.target.value;renderAll();};
+function resetArt(){cells.forEach(c=>{artOf[c.row+"_"+c.col]=c.card?{card:c.card,art:c.art}:null;});}
+
+const undoBtn=document.getElementById("undo");
+undoBtn.onclick=()=>{const h=undoStack.pop();if(h)swap(h[1],h[0],false);undoBtn.disabled=!undoStack.length;};
+function setMode(m){MODE=m;mLight.classList.toggle("on",m==="light");mDark.classList.toggle("on",m==="dark");renderAll();}
+const mLight=document.getElementById("mLight"), mDark=document.getElementById("mDark");
+mLight.onclick=()=>setMode("light"); mDark.onclick=()=>setMode("dark");
+let thinRAF=0;
+document.getElementById("thin").oninput=e=>{THIN=+e.target.value;cancelAnimationFrame(thinRAF);thinRAF=requestAnimationFrame(renderAll);};
 document.getElementById("expL").onclick=()=>exportSheet("light");
 document.getElementById("expD").onclick=()=>exportSheet("dark");
 document.getElementById("expJ").onclick=exportJSON;
-document.getElementById("reset").onclick=()=>{cells.forEach(c=>{artOf[c.row+"_"+c.col]=c.card?{card:c.card,art:c.art}:null;});renderAll();};
+document.getElementById("reset").onclick=()=>{clearPick();resetArt();undoStack.length=0;undoBtn.disabled=true;renderAll();};
+document.getElementById("loadArt").onclick=()=>document.getElementById("artFiles").click();
+document.getElementById("artFiles").onchange=async e=>{
+  for(const f of e.target.files){const m=f.name.match(/(card-\d+)\.png$/i);if(m)localArt[m[1].toLowerCase()]=URL.createObjectURL(f);}
+  const urls=Object.values(localArt);await preload(urls);renderAll();e.target.value="";
+};
+document.getElementById("impJ").onclick=()=>document.getElementById("jsonFile").click();
+document.getElementById("jsonFile").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{importJSON(JSON.parse(await f.text()));}catch(err){alert("Couldn't read that arrangement: "+err.message);}
+  e.target.value="";
+};
+addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key==="z"&&!undoBtn.disabled){e.preventDefault();undoBtn.click();}});
 init();
-</script></body></html>
+</script>
+</body>
+</html>

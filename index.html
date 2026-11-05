@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Card Forge — Spirit Strikers card studio</title>
+<meta name="description" content="Card Forge: the studio that builds the 49-card Spirit Strikers deck — deck editor, card inspector and a gallery of 98 procedural glass marbles.">
+<meta name="theme-color" content="#141416">
+<link rel="icon" href="elements/emblem_spirit.png">
+<link rel="stylesheet" href="assets/forge.css">
+<style>
+  .hero{position:relative;overflow:hidden;padding:56px 0 40px;
+    background:radial-gradient(900px 500px at 85% 10%,rgba(100,49,143,.35),transparent 60%),
+               radial-gradient(700px 420px at 0% 100%,rgba(28,107,175,.25),transparent 60%)}
+  .hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
+  .hero h1{font-size:clamp(40px,7vw,72px);color:var(--gold);letter-spacing:.5px;margin-bottom:12px;
+    text-shadow:0 2px 30px rgba(201,162,74,.25)}
+  .hero h1 small{display:block;font:600 14px/1.4 var(--font);letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;text-shadow:none}
+  .hero p{font-size:17px;color:#cfc9bd;max-width:54ch}
+  .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+  .box{justify-self:center;width:min(340px,80vw);border-radius:14px;box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06);
+    transform:perspective(900px) rotateY(-12deg) rotateX(3deg);transition:transform .5s ease}
+  .box:hover{transform:perspective(900px) rotateY(-3deg) rotateX(0)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:34px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .stat b{display:block;font:700 28px/1 var(--display);color:var(--gold2)}
+  .stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+  .factions{display:grid;grid-template-columns:repeat(7,1fr);gap:14px;margin-top:22px}
+  .fac{text-decoration:none;color:inherit;display:block;transition:transform .2s}
+  .fac:hover{transform:translateY(-6px)}
+  .fac .cardthumb{box-shadow:0 12px 30px rgba(0,0,0,.5),0 0 0 1px color-mix(in srgb,var(--c) 40%,transparent)}
+  .fac:hover .cardthumb{box-shadow:0 18px 40px color-mix(in srgb,var(--c) 45%,transparent)}
+  .fac h3{font-size:17px;margin:10px 0 0;color:var(--c)}
+  .fac p{margin:0;font-size:13px;color:var(--muted)}
+  .fac code{font-size:11px;color:#7d7a73}
+
+  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:22px;counter-reset:step}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;position:relative}
+  .step::before{counter-increment:step;content:counter(step);position:absolute;top:10px;right:12px;font:700 22px var(--display);color:#3c3b40}
+  .step .pic{height:120px;display:grid;place-items:center;margin-bottom:10px;border-radius:8px;
+    background:radial-gradient(circle at 50% 40%,#2a2a31,#151518)}
+  .step .pic img{max-height:108px;width:auto}
+  .step h3{font-size:16px;margin-bottom:4px}
+  .step p{margin:0;font-size:13px;color:var(--muted)}
+
+  .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:22px}
+  .tool{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
+  .tool:hover{border-color:var(--gold);transform:translateY(-3px)}
+  .tool .banner{height:150px;display:flex;align-items:center;justify-content:center;gap:6px;overflow:hidden;
+    background:linear-gradient(135deg,#202027,#121215)}
+  .tool .banner img{height:118px;width:auto;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6))}
+  .tool .banner .m{height:64px}
+  .tool .banner canvas{height:124px;width:auto;border-radius:6px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6))}
+  .tool div.body{padding:16px}
+  .tool h3{font-size:19px;color:var(--gold2)}
+  .tool p{margin:0;color:var(--muted);font-size:14px}
+
+  .shelf{display:grid;grid-template-columns:repeat(8,1fr);gap:12px;margin-top:22px}
+  .shelf a,.shelf div{display:block;text-decoration:none;color:var(--muted);font-size:12px;text-align:center}
+  .shelf img{border-radius:6px;box-shadow:0 8px 22px rgba(0,0,0,.5);margin-bottom:6px;transition:transform .2s}
+  .shelf a:hover img{transform:translateY(-4px) rotate(-1deg)}
+
+  @media (max-width:1000px){
+    .factions{grid-template-columns:repeat(4,1fr)}
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .shelf{grid-template-columns:repeat(4,1fr)}
+  }
+  @media (max-width:760px){
+    .hero .wrap{grid-template-columns:1fr}
+    .box{order:-1;width:min(200px,55vw);transform:none}
+    .tools{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:480px){
+    .factions{grid-template-columns:repeat(2,1fr)}
+    .steps{grid-template-columns:1fr}
+    .shelf{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="brand" href="index.html"><img src="elements/emblem_spirit.png" alt="">Card Forge</a>
+  <a class="tab" href="index.html" aria-current="page">Home</a>
+  <a class="tab" href="deck-editor.html">Deck Editor</a>
+  <a class="tab" href="inspector.html">Card Inspector</a>
+  <a class="tab" href="marbles.html">Marbles</a>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <h1><small>Spirit Strikers · card studio</small>Card Forge</h1>
+      <p>The production studio behind the 49-card <b>Spirit Strikers</b> deck. Hand-drawn line art goes in;
+        print-ready poker cards come out — polished marble borders, 98 unique glass-marble corner badges and
+        600&nbsp;DPI full-bleed frames, every pixel generated in code.</p>
+      <div class="cta">
+        <a class="btn primary" href="deck-editor.html">Open the deck editor →</a>
+        <a class="btn" href="inspector.html">Inspect a card</a>
+        <a class="btn" href="marbles.html">Browse 98 marbles</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>49</b><span>cards</span></div>
+        <div class="stat"><b>98</b><span>unique marbles</span></div>
+        <div class="stat"><b>7</b><span>factions</span></div>
+        <div class="stat"><b>600</b><span>DPI print</span></div>
+      </div>
+    </div>
+    <img class="box" src="docs/box.jpg" alt="Card Forge box art" width="671" height="900">
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="wrap">
+    <div class="eyebrow">The seven factions</div>
+    <h2>One element, one animal, one colour</h2>
+    <p class="lede">Every column of the deck belongs to a faction. Its colour runs through the marble border,
+      the gem emblem and both corner marbles. Tap a card to open it in the inspector.</p>
+    <div class="factions" id="factions"></div>
+  </div>
+</section>
+
+<section style="background:var(--bg2)">
+  <div class="wrap">
+    <div class="eyebrow">The studio</div>
+    <h2>Three tools, one deck</h2>
+    <div class="tools">
+      <a class="tool" href="deck-editor.html">
+        <div class="banner" data-cards="43,46,49"></div>
+        <div class="body"><h3>Deck Editor</h3><p>The full 7×7 deck live on canvas. Drag (or tap) artwork between cards and it recolours to its new element. Export deck sheets and <code>arrangement.json</code>.</p></div>
+      </a>
+      <a class="tool" href="inspector.html">
+        <div class="banner" data-cards="45" data-guides="1"></div>
+        <div class="body"><h3>Card Inspector</h3><p>Any card at print resolution with trim, safe-area and art-window guides. Check bleed, flip light/dark, download a 600&nbsp;DPI PNG.</p></div>
+      </a>
+      <a class="tool" href="marbles.html">
+        <div class="banner"><img class="m" src="marbles/01_top.png" alt=""><img class="m" src="marbles/11_bot.png" alt=""><img class="m" src="marbles/24_top.png" alt=""><img class="m" src="marbles/39_bot.png" alt=""><img class="m" src="marbles/49_top.png" alt=""></div>
+        <div class="body"><h3>Marble Gallery</h3><p>All 98 procedural glass orbs — one swirl per card and slot — filterable by faction, with a 3D tilt viewer.</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">The pipeline</div>
+    <h2>From line art to print</h2>
+    <p class="lede">Five Python stages turn sketches into press-ready files. Full story in
+      <a href="MAKING-OF.md">MAKING-OF.md</a>; the marble shader is in <a href="MARBLE-RECIPE.md">MARBLE-RECIPE.md</a>.</p>
+    <div class="steps">
+      <div class="step"><div class="pic"><img src="elements/symbol_wood.png" alt="" style="filter:invert(1)"></div><h3>Plan</h3><p>49 cards on a 7×7 grid: categories × elements, art pre-fit into the window.</p></div>
+      <div class="step"><div class="pic"><img src="borders/border_earth.png" alt=""></div><h3>Borders</h3><p>Procedural polished marble frames, colour-ramped per faction at 600&nbsp;DPI.</p></div>
+      <div class="step"><div class="pic"><img src="marbles/20_top.png" alt=""></div><h3>Marbles</h3><p>A 9-layer glass shader, seeded per card. Symbol on top, number below.</p></div>
+      <div class="step"><div class="pic"><img src="elements/emblem_electric.png" alt=""></div><h3>Assembly</h3><p>Layered Krita files where every paint layer clips to its shape.</p></div>
+      <div class="step"><div class="pic"><img src="borders/guides.png" alt="" style="background:#26262c;border-radius:4px"></div><h3>Review</h3><p>Contact sheets and this site render the exact assets that print.</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--bg2)">
+  <div class="wrap">
+    <div class="eyebrow">The Sovereign Software shelf</div>
+    <h2>More from Frog-dex</h2>
+    <p class="lede">Every box on the Spirit Strikers software shelf. Put the discs in the terminal at
+      <a href="https://frog-dex.github.io/terrace-world/library.html#software">the Terrace World library</a>.</p>
+    <div class="shelf">
+      <a href="https://github.com/Frog-dex/terrace-world"><img src="docs/shelf/terrace-world.jpg" alt="Terrace World box" loading="lazy">Terrace World</a>
+      <div><img src="docs/shelf/snowberry-os.jpg" alt="Snowberry OS box" loading="lazy">Snowberry OS</div>
+      <div><img src="docs/shelf/lizard-widget.jpg" alt="Lizard Widget box" loading="lazy">Lizard Widget</div>
+      <div><img src="docs/shelf/frog-widget.jpg" alt="Frog Widget box" loading="lazy">Frog Widget</div>
+      <a href="https://github.com/Frog-dex/3d-models-pack"><img src="docs/shelf/models-pack.jpg" alt="3D Models Pack box" loading="lazy">3D Models Pack</a>
+      <a href="https://github.com/Frog-dex/plan-and-code"><img src="docs/shelf/plan-and-code.jpg" alt="Plan &amp; Code box" loading="lazy">Plan &amp; Code</a>
+      <a href="https://github.com/Frog-dex/krita-agent"><img src="docs/shelf/krita-agent.jpg" alt="Krita Agent box" loading="lazy">Krita Agent</a>
+      <a href="https://github.com/Frog-dex/card-forge"><img src="docs/shelf/card-forge.jpg" alt="Card Forge box" loading="lazy">Card Forge</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">MIT © 2026 Blu Inman — the code is free; the Spirit Strikers artwork, characters and brand remain © Blu Inman.
+  · <a href="https://github.com/Frog-dex/card-forge">Source on GitHub</a></div></footer>
+
+<script src="assets/forge.js"></script>
+<script>
+(async()=>{
+  const {plan,factions}=await Forge.load();
+  const host=document.getElementById("factions");
+  for(const f of factions){
+    // the Elements row (row 6) holds one gem-emblem card per faction — a complete, art-bundled card
+    const cell=plan.cells.find(c=>c.row===6&&c.element===f.key);
+    const a=document.createElement("a"); a.className="fac"; a.href="inspector.html#"+cell.num; a.style.setProperty("--c",f.hex);
+    a.innerHTML=`<div class="cardthumb"><canvas width="330" height="450" aria-label="${f.name} faction card"></canvas></div>
+      <h3>${f.name}</h3><p>${f.animal}</p><code>${f.hex}</code>`;
+    host.appendChild(a);
+    Forge.drawCard(a.querySelector("canvas"),cell,{trim:true});
+  }
+  document.querySelectorAll(".banner[data-cards]").forEach(b=>b.dataset.cards.split(",").forEach(n=>{
+    const cv=document.createElement("canvas"); cv.width=182; cv.height=248; b.appendChild(cv);
+    Forge.drawCard(cv,plan.cells.find(c=>c.num===+n),{guides:!!b.dataset.guides});
+  }));
+})();
+</script>
+</body>
+</html>
